@@ -18,3 +18,29 @@ admin.initializeApp({
   databaseURL: "https://perro-pm-project.firebaseio.com"
 });
 
+
+
+/**  Query functions  **/
+async function getFirestore() {
+    const firestore_con = await admin.firestore();
+    const result = firestore_con.collection('Projects').doc('project').get().then(doc =>{
+        if (!doc.exists) {
+            console.log('No such document!');
+        } else {
+            return doc.data();
+        }
+    }).catch( err => {
+        console.log('Error getting document', err);
+    });
+    return result
+}
+
+
+
+/** Routes */
+app.get('/', async(request, response) => {
+    const db_result = await getFirestore();
+    response.render('index', {db_result});
+});
+
+exports.app = functions.https.onRequest(app)
