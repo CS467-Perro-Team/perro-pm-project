@@ -64,7 +64,6 @@ const userRoles = (aUser) => {
 /** Routes */
 app.get('/', async(request, response) => {
     const dbResult = await getFirestore('Projects', 'project');
-    // get user 
     const dbUser = await getFirestore('Users', 'user');
     const userRole = userRoles(dbUser);
     response.render('index', {dbResult, dbUser, userRole});
