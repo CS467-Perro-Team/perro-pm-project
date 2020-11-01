@@ -21,9 +21,15 @@ admin.initializeApp({
 
 
 /**  Query functions  **/
-async function getFirestore() {
+/*
+@desc Retrieves data from the database by requesting the collection and the document
+@param  collectionName - The name of a collection in Firestore DB
+        docName - The name of the document in the collection
+@return object - contains the document data
+*/
+async function getFirestore(collectionName, docName) {
     const firestore_con = await admin.firestore();
-    const result = firestore_con.collection('Projects').doc('project').get().then(doc =>{
+    const result = firestore_con.collection(collectionName).doc(docName).get().then(doc =>{
         if (!doc.exists) {
             console.log('No such document!');
         } else {
@@ -36,11 +42,32 @@ async function getFirestore() {
 }
 
 
+/*
+@desc  Determines the role of a user (project manager, project participant, or stakeholder) based on permission values
+@param aUser - the document that contains a specific user's data
+@return string - the role of a specific user
+*/
+const userRoles = (aUser) => {
+    const permissions = aUser.Permission;
+    let result;
+    if (permissions.projectCreator) {
+        result = "Project Manager";
+    } else if (permissions.taskCreator && !permissions.projectCreator){
+        result = "Project Participant";
+    } else {
+        return "Stakeholder";
+    }
+    return result;
+}
+
 
 /** Routes */
 app.get('/', async(request, response) => {
-    const db_result = await getFirestore();
-    response.render('index', {db_result});
+    const dbResult = await getFirestore('Projects', 'project');
+    // get user 
+    const dbUser = await getFirestore('Users', 'user');
+    const userRole = userRoles(dbUser);
+    response.render('index', {dbResult, dbUser, userRole});
 });
 
 exports.app = functions.https.onRequest(app)
