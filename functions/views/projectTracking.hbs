@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<title>Single Project</title>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<meta name="robots" content="noindex nofollow">
+  	</head>
+    <body class="container">
+
+    	<!-- Begin Header Container-->
+    	<div class="container">
+    		<div class="row pt-2 pr-3">
+	    		<div class="col-10 empty-container">
+			  	</div>
+				<div class="col-1 justify-content-lg-right">
+					<h4 id="logo"><a href="https://mypmwork.com">mypmwork.com</a></h4>
+  				</div>
+  			</div>
+    		<div class="row justify-content-lg-center">
+				<div class="col col-lg-auto pt-0">
+			  		<h1>{{dbProjects.projectName}}</h1>
+		  		</div>
+		  	</div>
+    	</div>
+    	<!-- End Header Container-->
+
+    	<!-- Begin Info Container -->
+    	<div class="container">
+    		<div class="row justify-content-between">
+  				<div class="col-6">
+					<div class="row">
+						<div class="col">
+							<span class="font-weight-bold">Username</span>
+							<span id="username">{{dbUser.login.username}}</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+	    					<span class="font-weight-bold">Role</span>
+	    					<span id="userRoll">{{userRole}}</span>
+	    				</div>
+	    			</div>	
+	    		</div>
+					<div class="col-4 pt-4">
+	      				<button id="createNewTask" class="button pr-1"><a href="/projectSummary">Summary</a></button>
+	      				<button id="createNewTask" class="button pl-1" style="background:#95BCF2; color:black !important"><a href="/projectTracking">Tracking</a></button>
+					</div>
+					<div class="col-2 justify-content-right">
+	      				<button id="createNewTask"><a href="/createTask">Create New Task</a></button>
+	      			</div>
+			</div>
+		</div>
+    	<!-- End User Info Container -->
+    	<!-- Begin Single Project Info Container -->
+
+		<div class="container pt-2">
+			<div class="row">
+				<div class="col-6">
+		      		<ul>
+		      			<li>{{dbProjects.projectName}}</li>
+		      			<ul>
+		      				<li>{{dbTasks.taskName}}</li>
+		      			</ul>
+		      		</ul>
+	      		</div>
+	      		<div class="col-6 border border-dark">
+
+	      		</div>
+	      	</div>
+      	</div><!--end container -->
+    </body>
+</html>

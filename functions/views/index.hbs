@@ -7,149 +7,35 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-		<script>
-			/* Temporary Functions for testing */
-			function tempSolution(){
-				$('#createProjectView').hide();
-				$('#seeProjectListButton').hide();
-			}
-			function createProject(){
-				$('#projectListView').hide();
-				$('#createProjectView').show();
-				$("#createProjectButton").hide();
-				$('#seeProjectListButton').show();
-			}
-			function seeProjectList(){
-				$('#projectListView').show();
-				$('#createProjectView').hide();
-				$("#createProjectButton").show();
-				$('#seeProjectListButton').hide();
-			}
-			/* Temporary Functions for testing */
-		</script>
-		<style>
-			td { border-right: 1px solid black !important; height: 35px !important;}
-			#createProjectView { border: 1px solid black; height: 400px; }
-		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
-    <body class="container" onload="tempSolution()">
-    	<div style="height:100px" class="container">
-    		<div class="row pt-2 pr-3">
-	    		<div class="col-10">
-			  	</div>
-				<div class="col-1 justify-content-lg-right">
-					<h4 id="logo">mypmwork.com</h4>
-  				</div>
-  			</div>
-    		<div class="row justify-content-lg-center">
-		  	</div>
-    		<div class="row justify-content-between">
-  				<div class="col-9">
-					<div class="row">
-						<div class="col">
-							<span id="usernameLabel" class="font-weight-bold">Username</span>
-							<span id="username">{{dbUser.login.username}}</span>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-	    					<span id="userRoleLabel" class="font-weight-bold">Role</span>
-	    					<span id="userRole">{{userRole}}</span>
-	    				</div>
-	    			</div>	
-	    		</div>
+    <body class="container">
+    	<div class="container">
 				<div class="justify-content-right pt-4 pr-3">
-      				<button id="createProjectButton" data-toggle="buttons" onclick="createProject()">Create Project</button>
-      				<button id="seeProjectListButton" data-toggle="buttons" onclick="seeProjectList()">See Project List</button>
+					<ul class="list-group">
+		      			<li class="list-group-item">
+	      					<a href="/projectList">This will be the Login View</a>
+		      			</li>
+						<li class="list-group-item">
+							<a href="/projectList">See The Project List View</a>
+						</li>
+						<li class="list-group-item">
+		      					<a href="/projectSummary">See The Single Project Summary View</a>
+		      			</li>
+		      			<li class="list-group-item">
+		      					<a href="/projectTracking">See The Single Project Tracking View</a>
+		      			</li>
+		      			<li class="list-group-item">
+		      					<a href="/createProject">See the Create Project View</a>
+		      			</li>
+		      			<li class="list-group-item">
+		      					<a href="/task">See the Single Task View</a>
+		      			</li>
+		      			<li class="list-group-item">
+		      					<a href="/projectList">See the Create Task View</a>
+		      			</li>
+		      		</ul>
       			</div>
 			</div>
-      	</div><!--end container -->
-		<div class="container pt-2">
-	    	<div id="createProjectView" class="container">
-    			<h2>Create Project View coming soon...</h2>
-    		</div>
-      		<div id="projectListView">
-	      		<table id="projectListTable" class="table table-striped border border-dark">
-	      			<thead class="thead-dark">
-		      			<tr scope="row">
-		      				<th scope="col">
-		      					Projects
-		      				</th>
-		      				<th scope="col">
-		      					Completed Tasks
-		      				</th>
-		      				<th scope="col">
-		      					Remaining Tasks
-		      				</th>
-		      				<th scope="col">
-		      					Total Tasks
-		      				</th>
-		      				<th scope="col">
-		      					% Complete
-		      				</th>
-	      				</tr>
-	      			</thead>
-	      			<tbody>
-		      			<tr class="table" scope="row">
-		      				<td class="border-right-dark "><a href="#">Project Name 1</a></td>
-		      				<td>5</td>
-		      				<td>5</td>
-		      				<td>10</td>
-		      				<td>50%</td>
-		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 2</a></td>
-		      				<td>2</td>
-		      				<td>17</td>
-		      				<td>19</td>
-		      				<td>10.5%</td>
-		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 3</a></td>
-		      				<td>15</td>
-		      				<td>22</td>
-		      				<td>37</td>
-		      				<td>40.5%</td>
-		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 4</a></td>
-		      				<td>2</td>
-		      				<td>3</td>
-		      				<td>5</td>
-		      				<td>40%</td>
-		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 5</a></td>
-		      				<td>0</td>
-		      				<td>8</td>
-		      				<td>8</td>
-		      				<td>0%</td>
-		      			</tr>	
-		      			<tr class="table" scope="row" >
-		      				<td class=""><a href="#"></a></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      			</tr>	
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#"></a></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      			</tr>	
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#"></a></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      			</tr>	
-		      		</tbody>
-	      		</table>
-	      	</div><!--end projectListView-->
-      	</div><!--end container -->
     </body>
 </html>

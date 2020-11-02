@@ -32,11 +32,13 @@ async function getFirestore(collectionName, docName) {
     const result = firestore_con.collection(collectionName).doc(docName).get().then(doc =>{
         if (!doc.exists) {
             console.log('No such document!');
+            return;
         } else {
             return doc.data();
         }
     }).catch( err => {
         console.log('Error getting document', err);
+            return;
     });
     return result
 }
@@ -62,11 +64,53 @@ const userRoles = (aUser) => {
 
 
 /** Routes */
-app.get('/', async(request, response) => {
-    const dbResult = await getFirestore('Projects', 'project');
+/** Routes */
+app.get('/', async(request, response) => {//will be login page
+    const dbProjects = await getFirestore('Projects', 'project');
     const dbUser = await getFirestore('Users', 'user');
+    const dbTasks = await getFirestore('Tasks','task1');
     const userRole = userRoles(dbUser);
-    response.render('index', {dbResult, dbUser, userRole});
+    response.render('index', {dbProjects, dbUser, userRole,dbTasks});
 });
 
+app.get('/task',async(request,response) =>{
+    const dbProjects = await getFirestore('Projects','project');
+    const dbUser = await getFirestore('Users','user');
+    const dbTasks = await getFirestore('Tasks','task1');
+    const dbComments = await getFirestore('Comments','comment1');
+    const userRole =userRoles(dbUser);
+    response.render('task',{dbProjects,dbUser,userRole,dbTasks,dbComments})
+})
+app.get('/createTask',async(request,response) =>{
+    const dbProjects = await getFirestore('Projects','project');
+    const dbUser = await getFirestore('Users','user');
+    const userRole =userRoles(dbUser);
+    response.render('createTask',{dbProjects,dbUser,userRole})
+})
+app.get('/projectList',async(request,response) =>{
+    const dbProjects = await getFirestore('Projects','project');
+    const dbUser = await getFirestore('Users','user');
+    const dbTasks = await getFirestore('Tasks','task1');
+    const userRole =userRoles(dbUser);
+    response.render('projectList',{dbProjects,dbUser,userRole,dbTasks})
+})
+app.get('/projectSummary',async(request,response) =>{
+    const dbProjects = await getFirestore('Projects','project');
+    const dbUser = await getFirestore('Users','user');
+    const dbTasks = await getFirestore('Tasks','task1');
+    const userRole =userRoles(dbUser);
+    response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
+})
+app.get('/projectTracking',async(request,response) =>{
+    const dbProjects = await getFirestore('Projects','project');
+    const dbUser = await getFirestore('Users','user');
+    const dbTasks = await getFirestore('Tasks','task1');
+    const userRole =userRoles(dbUser);
+    response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
+})
+app.get('/createProject',async(request,response) =>{
+    const dbUser = await getFirestore('Users','user');
+    const userRole =userRoles(dbUser);
+    response.render('createProject',{dbUser,userRole})
+})
 exports.app = functions.https.onRequest(app)
