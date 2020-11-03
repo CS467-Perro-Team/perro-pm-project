@@ -101,54 +101,15 @@
 		      				<td>10</td>
 		      				<td>50%</td>
 		      			</tr>
+						{{#each projectTable}}
 		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 2</a></td>
-		      				<td>2</td>
-		      				<td>17</td>
-		      				<td>19</td>
-		      				<td>10.5%</td>
+		      				<td class=""><a href="#">{{name}}</a></td>
+		      				<td>{{completedTasks}}</td>
+		      				<td>{{remainingTasks}}</td>
+		      				<td>{{totalTasks}}</td>
+		      				<td>{{complete}}%</td>
 		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 3</a></td>
-		      				<td>15</td>
-		      				<td>22</td>
-		      				<td>37</td>
-		      				<td>40.5%</td>
-		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 4</a></td>
-		      				<td>2</td>
-		      				<td>3</td>
-		      				<td>5</td>
-		      				<td>40%</td>
-		      			</tr>
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#">Project Name 5</a></td>
-		      				<td>0</td>
-		      				<td>8</td>
-		      				<td>8</td>
-		      				<td>0%</td>
-		      			</tr>	
-		      			<tr class="table" scope="row" >
-		      				<td class=""><a href="#"></a></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      			</tr>	
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#"></a></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      			</tr>	
-		      			<tr class="table" scope="row">
-		      				<td class=""><a href="#"></a></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
-		      				<td></td>
+						{{/each}}
 		      			</tr>	
 		      		</tbody>
 	      		</table>
