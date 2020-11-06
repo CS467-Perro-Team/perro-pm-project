@@ -160,10 +160,13 @@ app.get('/projectList',async(request,response) =>{
     const projectList = await getCollection('Projects');
     let projectRows = {};
     const projectTable = [];
-    let taskList;
+    const taskList = [];
+    for (const project of projectList) {
+        taskList.push(getTaskListFromAProject(project.projectName));
+    }
+    const taskCollection = await Promise.all(taskList);
     for (let i = 0; i < projectList.length; ++i) {
-        taskList = await getTaskListFromAProject(projectList[i].projectName);
-        projectRows = createObjectForProjectListView(projectList[i].projectName, taskList);
+        projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
         projectTable.push(projectRows)
     }
     response.render('projectList',{dbUser,userRole,projectTable});
