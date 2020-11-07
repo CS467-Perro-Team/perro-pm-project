@@ -77,12 +77,15 @@
       				</tr>
       			</thead>
       			<tbody>
-	      			<tr class="table-light">
-	      				<td><a href="/task">{{dbTasks.taskName}}</a></td>
-	      				<td>{{dbTasks.taskDescription}}</td>
-	      				<td>{{dbTasks.taskDueDate}}</td>
-	      				<td>warnemun</td>
-	      			</tr>
+					  {{#each dbTasks}}
+						<tr class="table-light">
+							<td><a href="/task">{{taskName}}</a></td>
+							<td>{{description}}</td>
+							<td>{{dueDate}}</td>
+							<td>{{assignee}}</td>
+						</tr>
+					  {{/each}}
+					  <!--
 	      			<tr class="table-secondary">
 	      				<td>Task 2 Name</td>
 	      				<td>Task 2 Description</td>
@@ -106,7 +109,8 @@
 	      				<td></td>
 	      				<td></td>
 	      				<td></td>
-	      			</tr>	
+	      			</tr>
+					  -->	
 	      		</tbody>
       		</table>
       	</div><!--end container -->

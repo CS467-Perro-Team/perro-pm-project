@@ -113,7 +113,7 @@ app.get('/task',async(request,response) =>{
     const dbUser = await getFirestore('Users','user');
     const dbTasks = await getFirestore('Tasks','task1');
     const dbComments = await getFirestore('Comments','comment1');
-    const userRole =userRoles(dbUser);
+    const userRole = userRoles(dbUser);
     response.render('task',{dbProjects,dbUser,userRole,dbTasks,dbComments})
 })
 
@@ -154,6 +154,7 @@ const createObjectForProjectListView = (projName, taskList) => {
 }
 
 
+/** The Project List view */
 app.get('/projectList',async(request,response) =>{
     const dbUser = await getFirestore('Users','user');
     const userRole =userRoles(dbUser);
@@ -173,14 +174,17 @@ app.get('/projectList',async(request,response) =>{
 })
 
 
+/** The Single Project Summary view */
 app.get('/projectSummary',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','project');
     const dbUser = await getFirestore('Users','user');
-    const dbTasks = await getFirestore('Tasks','task1');
-    const userRole =userRoles(dbUser);
+    const dbTasks = await getTaskListFromAProject(dbProjects.projectName);
+    const userRole = userRoles(dbUser);
     response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
 })
 
+
+/** The Single Project Tracking view */
 app.get('/projectTracking',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','project');
     const dbUser = await getFirestore('Users','user');
@@ -189,6 +193,8 @@ app.get('/projectTracking',async(request,response) =>{
     response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
 })
 
+
+/** The Create Project List view */
 app.get('/createProject',async(request,response) =>{
     const dbUser = await getFirestore('Users','user');
     const userRole =userRoles(dbUser);
