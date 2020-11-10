@@ -9,6 +9,11 @@
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 		<meta name="robots" content="noindex nofollow">
+		<style>
+			.table tbody tr td {
+				width: 25;
+			}
+		</style>
   	</head>
     <body class="container">
 
@@ -31,9 +36,9 @@
 
     	<!-- Begin Info Container -->
     	<div class="container">
-    		<div class="row justify-content-between">
-  				<div class="col-6">
-					<div class="row">
+    		<div class="row">
+  				<div class="col-5">
+					<div class="row pt-2">
 						<div class="col">
 							<span class="font-weight-bold">Username</span>
 							<span id="username">{{dbUser.login.username}}</span>
@@ -46,26 +51,28 @@
 	    				</div>
 	    			</div>	
 	    		</div>
-					<div class="col-4 pt-4">
-	      				<button id="projectSummaryButton" class="button pr-1" style="background:#95BCF2; color:black !important"><a href="/projectSummary">Summary</a></button>
-	      				<button id="projectTrackingButton" class="button pl-1"><a href="/projectTracking">Tracking</a></button>
-					</div>
-					<div class="col-2 justify-content-right">
-	      				<button id="createNewTask"><a href="/createTask">Create New Task</a></button>
-	      			</div>
+				<div class="col-4 pt-4">
+      				<button id="projectSummaryButton" class="button pr-1" style="background:#95BCF2; color:black !important"><a href="/projectSummary">Summary</a></button>
+      				<button id="projectTrackingButton" class="button pl-1"><a href="/projectTracking">Tracking</a></button>
+				</div>
+				<div class="col-1 empty-container">
+				</div>
+				<div class="col-2 pt-4">
+	  				<button id="createNewTask" class="float-right"><a href="/createTask">Create New Task</a></button>
+  				</div>
 			</div>
 		</div>
     	<!-- End User Info Container -->
-    	<!-- Begin Single Project Info Container -->
 
-		<div class="container pt-2">
-      		<table class="table border border-dark">
+    	<!-- Begin Single Project Info Container -->
+		<div class="container pt-2 table-responsive">
+      		<table class="table border border-dark table-striped">
       			<thead class="thead-dark">
 	      			<tr class="border border-dark">
-	      				<th scope="col">
-	      					Tasks
+	      				<th scope="col-3">
+	      					Task Name
 	      				</th>
-	      				<th scope="col">
+	      				<th scope="col-4">
 	      					Task Description
 	      				</th>
 	      				<th scope="col">
@@ -77,42 +84,17 @@
       				</tr>
       			</thead>
       			<tbody>
-					  {{#each dbTasks}}
-						<tr class="table-light">
-							<td><a href="/task">{{taskName}}</a></td>
-							<td>{{description}}</td>
-							<td>{{dueDate}}</td>
-							<td>{{assignee}}</td>
+					  {{#each dbTasks}} 
+						<tr scope="row">
+							<td class="taskNameField"><a href="/task">{{taskName}}</a></td>
+							<td class="taskDescriptionField">{{taskDescription}}</td>
+							<td class="taskDueDateField">{{taskDueDate}}</td>
+							<td class="taskAssignee">{{assignee}}</td>
 						</tr>
 					  {{/each}}
-					  <!--
-	      			<tr class="table-secondary">
-	      				<td>Task 2 Name</td>
-	      				<td>Task 2 Description</td>
-	      				<td>10/26/2020</td>
-	      				<td>warnemun</td>
-	      			</tr>
-	       			<tr class="table-light">
-	      				<td>Task 3 Name</td>
-	      				<td>Task 3 Description</td>
-	      				<td>11/2/2020</td>
-	      				<td>warnemun</td>
-	      			</tr>
-	      			<tr class="table-secondary">
-	      				<td></td>
-	      				<td></td>
-	      				<td></td>
-	      				<td></td>
-	      			</tr>
-	      			<tr class="table-light">
-	      				<td></td>
-	      				<td></td>
-	      				<td></td>
-	      				<td></td>
-	      			</tr>
-					  -->	
 	      		</tbody>
       		</table>
-      	</div><!--end container -->
+      	</div>
+      	<!--End Single Project Info Container -->
     </body>
 </html>
