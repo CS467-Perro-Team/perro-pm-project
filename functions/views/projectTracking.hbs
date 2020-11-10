@@ -31,9 +31,9 @@
 
     	<!-- Begin Info Container -->
     	<div class="container">
-    		<div class="row justify-content-between">
-  				<div class="col-6">
-					<div class="row">
+    		<div class="row">
+  				<div class="col-5">
+					<div class="row pt-2">
 						<div class="col">
 							<span class="font-weight-bold">Username</span>
 							<span id="username">{{dbUser.login.username}}</span>
@@ -46,30 +46,37 @@
 	    				</div>
 	    			</div>	
 	    		</div>
-					<div class="col-4 pt-4">
-	      				<button id="createNewTask" class="button pr-1"><a href="/projectSummary">Summary</a></button>
-	      				<button id="createNewTask" class="button pl-1" style="background:#95BCF2; color:black !important"><a href="/projectTracking">Tracking</a></button>
-					</div>
-					<div class="col-2 justify-content-right">
-	      				<button id="createNewTask"><a href="/createTask">Create New Task</a></button>
-	      			</div>
+				<div class="col-4 pt-4">
+      				<button id="projectSummaryButton" class="button pr-1"><a href="/projectSummary">Summary</a></button>
+      				<button id="projectTrackingButton" class="button pl-1" style="background:#95BCF2; color:black !important"><a href="/projectTracking">Tracking</a></button>
+				</div>
+				<div class="col-1 empty-container">
+				</div>
+				<div class="col-2 pt-4">
+	  				<button id="createNewTask" class="float-right"><a href="/createTask">Create New Task</a></button>
+  				</div>
 			</div>
 		</div>
     	<!-- End User Info Container -->
-    	<!-- Begin Single Project Info Container -->
 
+    	<!-- Begin Single Project Info Container -->
 		<div class="container pt-2">
-			<div class="row">
-				<div class="col-6">
+			<div class="row pr-3 pl-3">
+				<div class="col-3 border border-dark pr-5">
+					<h3 class="pt-1">Project Task List</h3>
 		      		<ul>
 		      			<li>{{dbProjects.projectName}}</li>
 		      			<ul>
+		      			{{#each dbTasks}}
 		      				<li>{{dbTasks.taskName}}</li>
+	      				{{/each}}
 		      			</ul>
 		      		</ul>
 	      		</div>
-	      		<div class="col-6 border border-dark">
-
+	      		<div class="col-1 empty-container">
+	      		</div>
+	      		<div class="col-8 border border-dark">
+	      			Data Visualization Table to go here...
 	      		</div>
 	      	</div>
       	</div><!--end container -->
