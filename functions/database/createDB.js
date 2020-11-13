@@ -1,14 +1,8 @@
 // Set up the database
 const functions = require('firebase-functions');
-/////const express = require('express');
-/////const engines = require('consolidate');
-/////const hbs = require('handlebars');
 const admin = require('firebase-admin');
-const getMySecretKey = require('./../secretKey');  // You need to make your own module
+const getMySecretKey = require('../secretKey');  // You need to make your own module
 const myData = require('./sampleData')
-///const db = require('./../index')
-
-
 
 
 // set up authentication with local environment
@@ -22,11 +16,6 @@ admin.initializeApp({
 
 const firestoreDB = admin.firestore();
 
-
-//const firestoreDB = db();
-/////const firestoreDB = db;
-///firestoreDB.
- 
 
 /**
  *  Functions to add data to the database
