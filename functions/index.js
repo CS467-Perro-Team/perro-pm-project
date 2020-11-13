@@ -21,6 +21,13 @@ admin.initializeApp({
 
 const firestoreCon = admin.firestore();
 
+/*
+function getAccessToDB() {
+    return firestoreCon;
+}
+
+module.exports = getAccessToDB;
+*/
 
 const giveAListOfDocuments = (collection) => {
     const listOfDocs = [];
