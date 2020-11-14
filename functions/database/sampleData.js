@@ -63,6 +63,7 @@ const projects = [
         dueDate: "",
         details: "This are some details for the Web App Project...",
         startDate: "",
+        team: [],
         status: "in progress"
     },
     {
@@ -70,6 +71,7 @@ const projects = [
         dueDate: "",
         details: "This are some details for the Ticket Machine...",
         startDate: "",
+        team: [],
         status: "in progress"
     },
     {
@@ -77,6 +79,7 @@ const projects = [
         dueDate: "",
         details: "This are some details for the Movie App Project...",
         startDate: "",
+        team: [],
         status: "in progress"
     },
     {
@@ -84,6 +87,7 @@ const projects = [
         dueDate: "",
         details: "This are some details for the Web App Project...",
         startDate: "",
+        team: [],
         status: "in progress"
     },
 ]
