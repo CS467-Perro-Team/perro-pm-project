@@ -82,19 +82,19 @@
       				<div class="row">
       					<div class="col-3">
       					</div>
-							<form>
+							<form action="/createProject" method="POST">
 	      				<div class="col">
 								<div class="row form-group">
 										<label for="projectNameInputLabel">Project Name</label>
 									<div class="col-8">
-										<input class="form-control" id="projectNameInput"  placeholder="Enter New Unique Project Name">
+										<input class="form-control" id="projectNameInput"  placeholder="Enter New Unique Project Name" name="projectName">
 									</div>
 								</div>
 								<div class="row form-group">
 										<label class="pr-1"for="projectStartDateLabel">Start date</label>
-										<input class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate">
+										<input class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="startDate">
 										<label class="pl-1 pr-1" for="projectStartDateLabel">Due date</label>
-										<input class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate">
+										<input class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="dueDate">
 								</div>
 								<div class="row form-group">
 									<label for="projectAssigneeLabel">Assigned To</label>
@@ -111,7 +111,7 @@
 								</div>
 								<div class="form-group">
 									<label for="projectNameInputLabel">Project Description</label>
-									<textarea class="form-control" id="projectNameInput"  placeholder="Brief Project Description"></textarea>
+									<textarea class="form-control" id="projectNameInput"  placeholder="Brief Project Description" name="details"></textarea>
 								</div>
 								<div class="row">
 									<div class="col float-left">
@@ -127,7 +127,8 @@
 									</div>
 									<div class="col"></div>
 									<div class="col-4 float-right">		
-										<button type="submit" class="btn btn-primary"><a href="projectSummary">Create Project</a></button>
+										{{!-- <button type="submit" class="btn btn-primary"><a href="projectSummary">Create Project</a></button> --}}
+										<button type="submit" class="btn btn-primary"> Create Project</button>
 									</div>
 								</div>
 		    			</div>

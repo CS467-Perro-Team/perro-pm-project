@@ -4,11 +4,15 @@ const engines = require('consolidate');
 const hbs = require('handlebars');
 const admin = require('firebase-admin');
 const getMySecretKey = require('./secretKey');  // You need to make your own module
+const { request, response } = require('express');
+const bodyParser = require('body-parser');
+
 
 const app = express();
 app.engine('hbs', engines.handlebars);
 app.set('views', './views');
 app.set('view engine', 'hbs');
+app.use(bodyParser.json());
 
 // set up authentication with local environment
 const serviceAccount = require(getMySecretKey());
@@ -32,6 +36,18 @@ const giveAListOfDocuments = (collection) => {
 
 
 /**  Query functions  **/
+
+/**
+ *  Functions to add data to the database
+ */
+const insertData = async (collectionName, docName, data) => {
+    if (docName === null) {
+        await firestoreCon.collection(collectionName).doc().set(data);
+    } else {
+        await firestoreCon.collection(collectionName).doc(docName).set(data);
+    }
+}
+
 /*
 @desc Retrieves data from the database by requesting the collection and the document
 @param  collectionName - The name of a collection in Firestore DB
@@ -199,5 +215,14 @@ app.get('/createProject',async(request,response) =>{
     const dbUser = await getFirestore('Users','user');
     const userRole =userRoles(dbUser);
     response.render('createProject',{dbUser,userRole})
+})
+
+app.post('/createProject', (request, response) =>{
+    let data = request.body;
+    // add the empty team array to the project
+    data["team"] = [];
+    // add the data to the database
+    insertData("Projects", data.projectName, data);
+    response.redirect("/projectList");
 })
 exports.app = functions.https.onRequest(app)
