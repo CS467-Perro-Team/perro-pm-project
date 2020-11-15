@@ -1,77 +1,66 @@
 <html>
 	<head>
 		<title>Single Task</title>
-		<!-- Latest compiled and minified CSS -->
+		<!-- Latest compiled and minified Bootstrap CSS -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 		<!-- jQuery library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-		<!-- Latest compiled JavaScript -->
+		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-		<script>
-			/* Temporary Functions for testing */
-			function tempSolution(){
-				$('#addCommentView').hide();
-				$('#singleTaskButton').hide();
-			}
-			function addComment(){
-				$('#singleTaskView').hide();
-				$('#addCommentView').show();
-				$("#addCommentButton").hide();
-				$('#singleTaskButton').show();
-			}
-			function singleTaskView(){
-				$('#addCommentView').hide();
-				$('#singleTaskView').show();
-				$('#singleTaskButton').hide();
-				$("#addCommentButton").show();
-			}
-			/* Temporary Functions for testing */
-		</script>
 		<style>
 			td { border-right: 1px solid black !important; height: 35px !important;}
+			a {color: black !important;}
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
     <body class="container" onload="tempSolution()">
     	
-    	<!--Begin Header Container-->
+		<!-- Begin Header Container-->
     	<div class="container">
-    		<div id="logoRow" class="row pt-2 pr-3 ">
+    		<div class="row pt-2 pr-3">
 	    		<div class="col-10 empty-container">
 			  	</div>
 				<div class="col-1 justify-content-lg-right">
-					<h4 id="logo"><a href="https://mypmwork.com">mypmwork.com</a></h4>
+					<h4 id="logo"><a href="/">mypmwork.com</a></h4>
   				</div>
-		  	</div>
-			<div class="row justify-content-lg-center">
+  			</div>
+    		<div class="row justify-content-lg-center">
 				<div class="col col-lg-auto pt-0">
-		  			<h1>{{dbProjects.projectName}}</h1>
-	  			</div>
-	  		</div>
-			<div class="row justify-content-between">
-				<div class="col-9">
-					<div class="row">
+			  		<h1>{{dbProjects.projectName}}</h1>
+		  		</div>
+		  	</div>
+    	</div>
+    	<!-- End Header Container-->
+
+    	<!-- Begin User Info Container -->
+    	<div class="container">
+    		<div class="row">
+  				<div class="col-5">
+					<div class="row pt-2">
 						<div class="col">
-							<span id="usernameLabel" class="font-weight-bold">Username</span>
+							<span class="font-weight-bold">Username</span>
 							<span id="username">{{dbUser.login.username}}</span>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col">
-	    					<span id="userRoleLabel" class="font-weight-bold">Role</span>
-	    					<span id="userRole">{{userRole}}</span>
+	    					<span class="font-weight-bold">Role</span>
+	    					<span id="userRoll">{{userRole}}</span>
 	    				</div>
 	    			</div>	
+	    		</div>
+				<div id="summaryTrackingButtons" class="col-4 pt-4 empty-container">
 				</div>
-				<div class="justify-content-right pt-4 pr-3 empty-container">
+				<div class="col-1 empty-container">
 				</div>
-      		</div>
-      	</div>
-      	<!--End Header Container -->
+				<div id="createButtons" class="col-2 pt-4 empty-container">
+  				</div>
+			</div>
+		</div>
+    	<!-- End User Info Container -->
       	
       	<!--Begin Main View Container-->
-      	<div id="mainContainer" class="container">
+      	<div id="mainView" class="container">
 	      	<!--End Single Task Info-->
 	      	<div id="singleTaskInfo" class="container pt-4">
 	 			<div class="row justify-content-between">

@@ -154,7 +154,7 @@ const createObjectForProjectListView = (projName, taskList) => {
         let completedTaskCount = count;
         let remainingTasks = totalTasks - completedTaskCount;
         let percentComplete = 0;
-        if (totalTasks != 0) {
+        if (totalTasks !== 0) {
             percentComplete = (completedTaskCount / totalTasks) * 100;
             percentComplete = parseInt(percentComplete);
         }
