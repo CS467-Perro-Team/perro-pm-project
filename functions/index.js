@@ -3,17 +3,27 @@ const express = require('express');
 const engines = require('consolidate');
 const hbs = require('handlebars');
 const admin = require('firebase-admin');
-const getMySecretKey = require('./secretKey');  // You need to make your own module
+const getMySecretKey = require('./secretKey');  // Comment out for deploy to firebase hosted domain
 const { request, response } = require('express');
 const bodyParser = require('body-parser');
 
-
 const app = express();
+//Set engine as handlebars
 app.engine('hbs', engines.handlebars);
+//Front end code will be in views folder
 app.set('views', './views');
+//Views will be hbs files
 app.set('view engine', 'hbs');
+//Parses incoming request bodies
 app.use(bodyParser.json());
 
+/*Replacement code for deploying to firebase hosted site*/
+//Authorize your application to access your Firestore DB
+//admin.initializeApp(functions.config().firebase);
+/*Replacement code for deploying to firebase hosted site*/
+
+
+//Replace this code block with replacement code above if deploying to firebase hosted domain
 // set up authentication with local environment
 const serviceAccount = require(getMySecretKey());
 
@@ -21,10 +31,9 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://perro-pm-project.firebaseio.com"
 });
-
+//Replace this code block with replacement code above
 
 const firestoreCon = admin.firestore();
-
 
 const giveAListOfDocuments = (collection) => {
     const listOfDocs = [];
@@ -36,7 +45,6 @@ const giveAListOfDocuments = (collection) => {
 
 
 /**  Query functions  **/
-
 /**
  *  Functions to add data to the database
  */
@@ -47,7 +55,6 @@ const insertData = async (collectionName, docName, data) => {
         await firestoreCon.collection(collectionName).doc(docName).set(data);
     }
 }
-
 /*
 @desc Retrieves data from the database by requesting the collection and the document
 @param  collectionName - The name of a collection in Firestore DB
@@ -192,9 +199,9 @@ app.get('/projectList',async(request,response) =>{
 
 /** The Single Project Summary view */
 app.get('/projectSummary',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','project');
-    const dbUser = await getFirestore('Users','user');
-    const dbTasks = await getTaskListFromAProject(dbProjects.projectName);
+    const dbProjects = await getFirestore('Projects','Better Firestore Project');  //add reference for chosen project
+    const dbUser = await getFirestore('Users','user'); // add variable to pull in user logged in
+    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole = userRoles(dbUser);
     response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
 })
@@ -202,9 +209,9 @@ app.get('/projectSummary',async(request,response) =>{
 
 /** The Single Project Tracking view */
 app.get('/projectTracking',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','project');
-    const dbUser = await getFirestore('Users','user');
-    const dbTasks = await getFirestore('Tasks','task1');
+    const dbProjects = await getFirestore('Projects','Better Firestore Project'); //add reference for chosen project
+    const dbUser = await getFirestore('Users','user'); // add variable to pull in user logged in
+    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole =userRoles(dbUser);
     response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
 })
