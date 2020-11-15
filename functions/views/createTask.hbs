@@ -32,7 +32,7 @@
     	</div>
     	<!-- End Header Container-->
 
-    	<!-- Begin User Info Container -->
+    	<!-- Begin Info Container -->
     	<div class="container">
     		<div class="row">
   				<div id="userInfo" class="col-5">
@@ -61,51 +61,58 @@
       	
       	<!--Begin Main View Container-->
       	<div id="mainView" class="container pt-2">
-      		<!--Begin Add Project Details Container-->
+      		<!--Begin Add Task Details Container-->
 			<div class="container pt-4">
-      				<div class="row">
-      					<div class="col-3">
-      					</div>
-						<form class="col">
-								<div class="row form-group">
-										<label for="taskNameInputLabel">Task Name</label>
-									<div class="col-8">
-										<input class="form-control" id="taskNameInput"  placeholder="Enter New Unique Task Name">
-									</div>
+  				<div class="row">
+  					<div class="col-3 empty-container">
+  					</div>
+					<div class="col">
+						<form action="/createTask" method="POST">
+							<div class="row form-group">
+								<label id="taskNameInputLabel" for="taskNameInput">Task Name</label>
+								<div class="col pr-0">
+									<input type="text" class="form-control border border-dark" id="taskNameInput"  placeholder="Enter New Unique Task Name" name="taskName">
 								</div>
-								<div class="row form-group">
-										<label class="pr-4" for="taskStartDateLabel">Due date</label>
-										<input class="datepicker" data-date-format="mm/dd/yyy" id="taskStartDate">
+							</div>
+				
+							<div class="row form-group">
+								<label class="pr-4 mr-1" for="taskDueDate">Due date</label>
+								<input type="date" class="datepicker pl-2" data-date-format="mm/dd/yyy" id="taskDueDate" name="dueDate">
+							</div>
+				
+							<div class="row form-group">
+								<label id="taskAssigneeLabel" class="pr-2" for="taskAssignee">Assign To</label>
+								<div class="col-6">
+									<select id="taskAssignee" class="form-control border border-dark" name="taskAssignee">
+										<!--{{#each projectManagers}}
+								  		<option>{{username}}</option>
+								  		{{/each}}-->
+							   			<option>lindorg</option>
+							    		<option>warnemun</option>
+									</select>
 								</div>
-								<div class="row form-group">
-									<label class="pr-3" for="taskAssigneeLabel">Assign To</label>
-									<div class="dropdown">
-									  	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									    Select User
-									  	</button>
-									  	<div class="dropdown-menu">
-									   		<a class="dropdown-item" href="#">lindorg</a>
-									    	<a class="dropdown-item" href="#">warnemun</a>
-									  	</div>
-									</div>
+							</div>
+							<div class="row form-group">
+								<label id="taskDescriptionInputLabel"for="taskDescriptionInput">Task Description</label>
+								<textarea class="form-control border border-dark" id="taskDescriptionInput"  placeholder="Brief Task Description" name="taskDescription"></textarea>
+							</div>
+				
+							<div class="row">
+
+								<div class="col-8 empty-container">
 								</div>
-								<div class="row form-group">
-									<label for="taskNameInputLabel">Task Description</label>
-									<textarea class="form-control" id="taskNameInput"  placeholder="Brief Task Description"></textarea>
+
+								<div class="col pr-0">		
+									<button type="submit" class="btn btn-primary float-right"><a href="/task">Create Task</a></button>
 								</div>
-								<div class="row">
-									<div class="col float-left">
-									</div>
-									<div class="col"></div>
-									<div class="col-4 float-right">		
-										<button type="submit" class="btn btn-primary"><a href="/task">Create Task</a></button>
-									</div>
-								</div>
+
+							</div>
 						</form>
-      					<div class="col-3">
-      					</div>
-		    		</div>
-		    </div>
+					</div>
+					<div class="col-3">
+  					</div>
+  				</div>
+	    	</div>
       		<!--End Add Project Details Container-->
       	</div>
       	<!--End Main View Container-->

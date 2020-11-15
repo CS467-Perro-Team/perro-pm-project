@@ -70,20 +70,24 @@
 						<form action="/createProject" method="POST">
 							<div class="row form-group">
 								<label id="projectNameInputLabel" for="projectNameInput">Project Name</label>
-								<div class="col-8">
-									<input type="text" class="form-control" id="projectNameInput"  placeholder="Enter New Unique Project Name" name="projectName">
+								<div class="col pr-0">
+									<input type="text" class="form-control border border-dark" id="projectNameInput"  placeholder="Enter New Unique Project Name" name="projectName">
 								</div>
 							</div>
 							<div class="row form-group">
-									<label class="pr-1" for="projectStartDateLabel">Start date</label>
-									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDateLabel" name="startDate">
-									<label class="pl-1 pr-1" class="projectStartDateLabel" for="projectStartDate">Due date</label>
+								<div class="col pl-0">
+									<label id="projectStartDateLabel" class="pr-1" for="projectStartDate">Start date</label>
+									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="startDate">
+								</div>
+								<div>
+									<label id="projectStartDateLabel" class="pl-1 pr-1" for="projectStartDate">Due date</label>
 									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="dueDate">
+								</div>
 							</div>
 							<div class="row form-group">
-								<label for="projectAssigneeLabel">Assigned To</label>
-								<div class="dropdown pl-3">
-								  	<select class="form-control" id="projectAssigneeLabel" name="projectManager">
+									<label id="projectAssigneeLabel" for="projectAssignee">Assigned To</label>
+								<div class="col-6 pr-0">
+								  	<select class="form-control border border-dark" id="projectAssignee" name="projectManager">
 										<!--{{#each projectManagers}}
 								  		<option>{{username}}</option>
 								  		{{/each}}-->
@@ -97,13 +101,13 @@
 								</div>
 							</div>
 							<div class="row form-group">
-								<label class="projectDescriptionInputLable" for="projectDescriptionInput">Project Description</label>
-								<textarea class="form-control" id="projectDescriptionInput"  placeholder="Brief Project Description" name="details"></textarea>
+								<label class="projectDescriptionInputLabel" for="projectDescriptionInput">Project Description</label>
+								<textarea class="form-control border border-dark" id="projectDescriptionInput"  placeholder="Brief Project Description" name="projectDescription"></textarea>
 							</div>
 							<div class="row">
 								<div class="form-group">
-									<label for="addFollowers">Add Followers</label>
-								  	<select multiple class="form-control" id="addFollowers">
+									<label for="addFollowers">Add Participants</label>
+								  	<select multiple class="col form-control border border-dark" id="addFollowers">
 										<!--{{#each users}}
 								  		<option>{{username}}</option>
 								  		{{/each}}-->
@@ -115,11 +119,11 @@
 								  		<option>burnse</option>
 								  	</select>
 								</div>
-							</div>
-							<div class="col">
-							</div>
-							<div class="col-4 float-right">		
-								<button type="submit" class="btn btn-primary">Create Project</button>
+								<div class="col">
+								</div>
+								<div class="col-4 pr-0">		
+									<button type="submit" class="btn btn-primary float-right">Create Project</button>
+								</div>
 							</div>
 						</form>
 					</div>
