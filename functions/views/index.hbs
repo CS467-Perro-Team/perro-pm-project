@@ -8,37 +8,144 @@
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 		<style>
+			html, body{
+				height: 100%;
+				margin: 0;
+			}
+			footer {
+				height: 50px;
+			}
+			h1 {
+				font-size: 24px !important;
+			}
+			.mainView {
+				min-height: 100%;
+				margin-bottom: -50px;
+			}
+			.login-container{
+				min-height: 66%;
+				margin-bottom: 0px;
+			}
+			.internal-top-row, .internal-email-row {
+				min-height: 25%
+			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
 		</style>
 		<meta name="robots" content="noindex nofollow">
+		<meta name="google-signin-scope" content="profile email">
+    	<meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+    	<script src="https://apis.google.com/js/platform.js" async defer></script>
   	</head>
+
+  	<!-- Begin Body -->
     <body class="container">
-    	<div class="container">
-				<div class="justify-content-right pt-4 pr-3">
-					<ul class="list-group">
-		      			<li class="list-group-item">
-	      					<a href="/projectList">This will be the Login View which will lead to...</a>
-		      			</li>
-						<li class="list-group-item">
-							<a href="/projectList">See The Project List View</a>
-						</li>
-						<li class="list-group-item">
-		      					<a href="/projectSummary">See The Single Project Summary View</a>
-		      			</li>
-		      			<li class="list-group-item">
-		      					<a href="/projectTracking">See The Single Project Tracking View</a>
-		      			</li>
-		      			<li class="list-group-item">
-		      					<a href="/createProject">See the Create Project View</a>
-		      			</li>
-		      			<li class="list-group-item">
-		      					<a href="/task">See the Single Task View</a>
-		      			</li>
-		      			<li class="list-group-item">
-		      					<a href="/createTask">See the Create Task View</a>
-		      			</li>
-		      		</ul>
-      			</div>
-			</div>
+    	<!-- Begin mainView-->
+    	<div class="container mainView">
+    		<div class="row empty-row mb-4">
+    		</div>
+    		<!-- Begin login row-->
+    		<div class="row login-container mt-4">
+    			<!-- Begin empty left col-->
+	    		<div class="col empty-col">
+	    		</div>
+				<!-- End empty left col-->
+
+    			<!-- Begin login-box container-->
+				<div class="login-box container col-4 border barder-dark">
+
+						<!-- Begin internal login top row -->
+						<div class="row internal-top-row">
+						</div>
+						<!-- End internal login top row -->
+
+						<div class="row internal-google-row mb-2">
+							<div class="col-1">
+							</div>
+							<div class="col">
+								<h1 class="text-center"><a href="/">mypmwork.com</a></h1>
+							</div>
+						</div>
+						<div class="row mt-2">
+							<div class="col-1">
+							</div>
+							<div class="col">
+								<div class="g-signin2" style="width:275"data-onsuccess="onSignIn" data-theme="light"></div>
+							</div>
+						</div>
+						<!-- The surrounding HTML is left untouched by FirebaseUI.
+		     			Your app may use that space for branding, controls and other customizations.-->
+					    <script>
+					      function onSignIn(googleUser) {
+					        // Useful data for your client-side scripts:
+					        var profile = googleUser.getBasicProfile();
+					        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+					        console.log('Full Name: ' + profile.getName());
+					        console.log('Given Name: ' + profile.getGivenName());
+					        console.log('Family Name: ' + profile.getFamilyName());
+					        console.log("Image URL: " + profile.getImageUrl());
+					        console.log("Email: " + profile.getEmail());
+
+					        // The ID token you need to pass to your backend:
+					        var id_token = googleUser.getAuthResponse().id_token;
+					        console.log("ID Token: " + id_token);
+					      }
+					    </script>
+							<!-- End empty right col-->
+						<div class="row internal-email-row mb-0 pt-4">
+							<div class="col-1">
+							</div>
+							<div class="col">
+								<p class="text-center" style="font-size:12">Don't have an account? <a href='/projectList'>Sign up</a></p>
+							</div>
+						</div>
+						<div class="row">
+						</div>
+						<div class="row">
+							<div class="col-1 mr-0">
+							</div>
+							<div class="col ml-0 mr-0">
+								<p class="" style="font-size:10">This site is protected by the Google <a href="#">privacy policy</a> and</br><a href="#"> Terms of Service apply</a></p>
+							</div>
+						</div>
+				</div>
+				<!-- End login-box container -->
+				<!-- Begin empty right col-->
+				<div class="col empty-col">
+				</div>
+				<!-- End empty right col-->
+    		</div>		
+			<!-- End login row-->
+		</div>
+		<!-- End mainView -->
+		<!-- Begin Footer -->
+	    <footer class="footer">
+	    	<!-- Begin Footer Row -->
+	    	<div class="row">
+	    		<!-- Begin empty left column -->
+	    		<div class="col">
+	    		</div>
+	    		<!-- End empty left column -->
+
+	    		<!-- Begin Middle column -->
+				<div class="col-6">
+					<ul class="nav">
+						<li class="nav-item"><a class="nav-link" href="/">mypmwork.com</a></li>
+						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
+						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
+						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
+						<li class="nav-item"><a class="nav-link" href="#" onclick="signOut();">sign out</a></li>
+					</ul>
+	    		</div>
+	    		<!-- End Middle column -->
+
+	    		<div class="col">
+	    		</div>
+	    		<!-- End empty right column -->
+	    	</div>
+	    	<!-- End Footer Row-->
+	    </footer>
+	    <!-- End Footer -->
     </body>
+  	<!-- End Body -->
+
 </html>

@@ -132,22 +132,28 @@ app.get('/', async(request, response) => {//will be login page
 });
 
 app.get('/task',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','project');
+    const dbProjects = await getFirestore('Projects','Better Firestore Project');
     const dbUser = await getFirestore('Users','user');
     const dbTasks = await getFirestore('Tasks','task1');
     const dbComments = await getFirestore('Comments','comment1');
     const userRole = userRoles(dbUser);
-    response.render('task',{dbProjects,dbUser,userRole,dbTasks,dbComments})
-})
+    response.render('task',{dbProjects,dbUser,userRole,dbTasks,dbComments});
+});
 
 app.get('/createTask',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','project');
+    const dbProjects = await getFirestore('Projects','Better Firestore Project');
     const dbUser = await getFirestore('Users','user');
     const userRole =userRoles(dbUser);
-    response.render('createTask',{dbProjects,dbUser,userRole})
-})
-
-
+    response.render('createTask',{dbProjects,dbUser,userRole});
+});
+app.post('/createTask', (request, response) =>{
+    let data = request.body;
+    // add the empty team array to the project
+    data["team"] = [];
+    // add the data to the database
+    //insertData("Projects", data.projectName, data);
+    response.redirect("/task");
+});
 // create an object for the table in project list view
 const createObjectForProjectListView = (projName, taskList) => {
         let totalTasks = taskList.length;
@@ -176,7 +182,6 @@ const createObjectForProjectListView = (projName, taskList) => {
         return projectListView;
 }
 
-
 /** The Project List view */
 app.get('/projectList',async(request,response) =>{
     const dbUser = await getFirestore('Users','user');
@@ -191,11 +196,10 @@ app.get('/projectList',async(request,response) =>{
     const taskCollection = await Promise.all(taskList);
     for (let i = 0; i < projectList.length; ++i) {
         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
-        projectTable.push(projectRows)
+        projectTable.push(projectRows);
     }
     response.render('projectList',{dbUser,userRole,projectTable});
-})
-
+});
 
 /** The Single Project Summary view */
 app.get('/projectSummary',async(request,response) =>{
@@ -204,8 +208,7 @@ app.get('/projectSummary',async(request,response) =>{
     const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole = userRoles(dbUser);
     response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
-})
-
+});
 
 /** The Single Project Tracking view */
 app.get('/projectTracking',async(request,response) =>{
@@ -214,15 +217,14 @@ app.get('/projectTracking',async(request,response) =>{
     const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole =userRoles(dbUser);
     response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
-})
-
+});
 
 /** The Create Project List view */
 app.get('/createProject',async(request,response) =>{
     const dbUser = await getFirestore('Users','user');
     const userRole =userRoles(dbUser);
-    response.render('createProject',{dbUser,userRole})
-})
+    response.render('createProject',{dbUser,userRole});
+});
 
 app.post('/createProject', (request, response) =>{
     let data = request.body;
@@ -231,5 +233,9 @@ app.post('/createProject', (request, response) =>{
     // add the data to the database
     insertData("Projects", data.projectName, data);
     response.redirect("/projectList");
-})
-exports.app = functions.https.onRequest(app)
+});
+
+app.get('/siteMap',(request,response) =>{
+    response.render('siteMap');
+});
+exports.app = functions.https.onRequest(app);

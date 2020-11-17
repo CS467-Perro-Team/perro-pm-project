@@ -8,6 +8,17 @@
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 		<style>
+			html, body{
+				height: 100%;
+				margin: 0;
+			}
+			footer {
+				height: 50px;
+			}
+			.mainView {
+				min-height: 100%;
+				margin-bottom: -50px;
+			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
 			a {color: black !important;}
 		</style>
@@ -60,7 +71,7 @@
     	<!-- End User Info Container -->
       	
       	<!--Begin Main View Container-->
-      	<div id="mainView" class="container pt-2">
+      	<div class="mainView container pt-2">
       		<!--Begin Add Project Details Container-->
 			<div class="container pt-4">
   				<div class="row">
@@ -135,5 +146,33 @@
       		<!--End Add Project Details Container-->
       	</div>
       	<!--End Main View Container-->
+		<!-- Begin Footer -->
+	    <footer class="footer">
+	    	<!-- Begin Footer Row -->
+	    	<div class="row">
+	    		<!-- Begin empty left column -->
+	    		<div class="col">
+	    		</div>
+	    		<!-- End empty left column -->
+
+	    		<!-- Begin Middle column -->
+				<div class="col-6">
+					<ul class="nav">
+						<li class="nav-item"><a class="nav-link" href="/">mypmwork.com</a></li>
+						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
+						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
+						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
+						<li class="nav-item"><a class="nav-link" href="#" onclick="signOut();">sign out</a></li>
+					</ul>
+	    		</div>
+	    		<!-- End Middle column -->
+
+	    		<div class="col">
+	    		</div>
+	    		<!-- End empty right column -->
+	    	</div>
+	    	<!-- End Footer Row-->
+	    </footer>
+	    <!-- End Footer -->
     </body>
 </html>

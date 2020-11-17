@@ -8,6 +8,20 @@
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 		<style>
+			html, body{
+				height: 100%;
+				margin: 0;
+			}
+			footer {
+				height: 50px;
+			}
+			.mainView {
+				min-height: 100%;
+				margin-bottom: -50px;
+			}
+			.taskDescription, .taskComments {
+				min-height: 100px;
+			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
 			a {color: black !important;}
 		</style>
@@ -60,9 +74,9 @@
     	<!-- End User Info Container -->
       	
       	<!--Begin Main View Container-->
-      	<div id="mainView" class="container">
+      	<div class="mainView container pt-2">
 	      	<!--End Single Task Info-->
-	      	<div id="singleTaskInfo" class="container pt-4">
+	      	<div id="singleTaskInfo" class="container pt-4 pl-0 pr-0">
 	 			<div class="row justify-content-between">
 	      			<div class="col 6">
 	      				<div class="row">
@@ -89,15 +103,15 @@
 	      	<!--End Single Task Info-->
 
 		    <!--Being Single Task Detail Container-->
-		    <div class="container pt-4">
+		    <div class="taskDetails container pt-4 pl-0 pr-0">
 
 		    	<!--Beginning Lables for Task Details Row-->
-				<div class="row pb-1">
-					<div class="col-10 pt-1">
+				<div class="row pb-2 mr-0">
+					<div class="col-10 pt-1 mr-0">
 						<span id="taskDescriptionLabel" class="font-weight-bold">Task Description</span>
 					</div>
-					<div class="float-right">
-	      				<button id="addCommentButton"  data-toggle="buttons">Add Comment</button>
+					<div class="col mr-0 pr-0">
+	      				<button id="addCommentButton" class="mr-0 float-right" data-toggle="buttons">Add Comment</button>
 	  				</div>
 	  			</div>
 		    	<!--End Labels for Task Details Row-->
@@ -106,13 +120,13 @@
 	  			<div class="row pl-3">
 		    		
 		    		<!--Beginning Task Description Container-->
-					<div id=taskDescription class="col-6 border border-dark">{{dbTasks.taskDescription}}
+					<div id=taskDescription class="taskDescription col-6 border border-dark">{{dbTasks.taskDescription}}
 					</div>
 		    		<!--End Tesk Description Container-->
 
 		    		<!--Beggining Comments Div-->
-	  				<div id="taskComments" class="col-6">
-						<table id="commentTable" class="table table-striped border border-dark">
+	  				<div id="taskComments" class="taskComments col-6">
+						<table id="commentTable" class="commentTable table table-striped border border-dark">
 	  						<thead class="thead-dark">
 				      			<tr scope="row">
 				      				<th scope="col">
@@ -159,5 +173,33 @@
 		    <!--End Single Task Detail Containers-->
 		</div>
       	<!--End Main View Container-->
+		<!-- Begin Footer -->
+	    <footer class="footer">
+	    	<!-- Begin Footer Row -->
+	    	<div class="row">
+	    		<!-- Begin empty left column -->
+	    		<div class="col">
+	    		</div>
+	    		<!-- End empty left column -->
+
+	    		<!-- Begin Middle column -->
+				<div class="col-6">
+					<ul class="nav">
+						<li class="nav-item"><a class="nav-link" href="/">mypmwork.com</a></li>
+						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
+						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
+						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
+						<li class="nav-item"><a class="nav-link" href="#" onclick="signOut();">sign out</a></li>
+					</ul>
+	    		</div>
+	    		<!-- End Middle column -->
+
+	    		<div class="col">
+	    		</div>
+	    		<!-- End empty right column -->
+	    	</div>
+	    	<!-- End Footer Row-->
+	    </footer>
+	    <!-- End Footer -->
     </body>
 </html>
