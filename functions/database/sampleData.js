@@ -2,6 +2,7 @@
  * Sample Data for Firestore
  *  The arrays are collections, and the objects are the documents
  */
+/*
 const user = [
     {
         firstName: "Harrison",
@@ -151,6 +152,9 @@ const tasksForProject3 = [
         taskDescription: "Describe something about writing test cases..."
     }
 ]
+*/
+
+
 
 /**
  * Sample Data for Firestore
@@ -354,6 +358,8 @@ const sampleData = {
 
 exports.data = sampleData;
 
+/*
+
 const tasksForProject4 = [
     {
         assignee: null,
@@ -400,3 +406,4 @@ const sampleData = {
 }
 
 exports.data = sampleData;
+*/
