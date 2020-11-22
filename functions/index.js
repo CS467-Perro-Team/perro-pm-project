@@ -6,8 +6,11 @@ const admin = require('firebase-admin');
 const getMySecretKey = require('./secretKey');  // Comment out for deploy to firebase hosted domain
 const { request, response } = require('express');
 const bodyParser = require('body-parser');
+const {OAuth2Client} = require('google-auth-library');
 
 const app = express();
+const CLIENT_ID = "610981118515-qjg25168rofh9s2bkf6ec53lk46sp4vn.apps.googleusercontent.com";
+const client = new OAuth2Client(CLIENT_ID);
 //Set engine as handlebars
 app.engine('hbs', engines.handlebars);
 //Front end code will be in views folder
@@ -123,12 +126,14 @@ const userRoles = (aUser) => {
 
 
 /** Routes */
-app.get('/', async(request, response) => {//will be login page
-    const dbProjects = await getFirestore('Projects', 'project');
+app.get('/', (request, response) => {//will be login page
+    /*const dbProjects = await getFirestore('Projects', 'project');
     const dbUser = await getFirestore('Users', 'user');
     const dbTasks = await getFirestore('Tasks','task1');
     const userRole = userRoles(dbUser);
     response.render('index', {dbProjects, dbUser, userRole,dbTasks});
+    */
+    response.render('index')
 });
 
 app.get('/task',async(request,response) =>{
@@ -238,4 +243,23 @@ app.post('/createProject', (request, response) =>{
 app.get('/siteMap',(request,response) =>{
     response.render('siteMap');
 });
+
+// handling authentication token
+async function verify(token) {
+    const ticket = await client.verifyIDToken({
+        idToken: token,
+        audience: CLIENT_ID
+    })
+    const payload = ticket.payload();
+    const userID = payload["sub"]
+} 
+
+app.post('/tokensignin', function(request, response) {
+    let token = request.body
+    console.log("SERVER - HERE IS THE TOKEN:")
+    console.log(token)
+    // verify the token
+    verify(token).catch(console.error);
+    return response.end("done")
+})
 exports.app = functions.https.onRequest(app);

@@ -33,7 +33,9 @@
 		</style>
 		<meta name="robots" content="noindex nofollow">
 		<meta name="google-signin-scope" content="profile email">
-    	<meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+    	{{!-- <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com"> --}}
+		<!-- Change the Client ID before deployment -->
+    	<meta name="google-signin-client_id" content="610981118515-qjg25168rofh9s2bkf6ec53lk46sp4vn.apps.googleusercontent.com">
     	<script src="https://apis.google.com/js/platform.js" async defer></script>
   	</head>
 
@@ -88,7 +90,23 @@
 					        // The ID token you need to pass to your backend:
 					        var id_token = googleUser.getAuthResponse().id_token;
 					        console.log("ID Token: " + id_token);
+							// send the ID token to the server
+							const xhr = new XMLHttpRequest();
+							xhr.open('POST', "http://localhost:5000/tokensignin");
+							xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+							xhr.onload = function() {
+								console.log('Signed in as: ' + xhr.responseText)
+							}
+							xhr.send('idtoken= ' + id_token)
 					      }
+						  // send the ID token to the server
+						  //const xhr = new XMLHttpRequest();
+						  //xhr.open('POST', "http://localhost:5000/tokensignin");
+						  //xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+						  //xhr.onload = function() {
+							//  console.log('Signed in as: ' + xhr.responseText)
+						  //}
+						  //xhr.send('idtoken= ' + id_token) 
 					    </script>
 							<!-- End empty right col-->
 						<div class="row internal-email-row mb-0 pt-4">
