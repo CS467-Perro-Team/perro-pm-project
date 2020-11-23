@@ -181,6 +181,10 @@ const createObjectForProjectListView = (projName, taskList) => {
         }
         return projectListView;
 }
+/** The Sign Up View*/
+app.get('/signUp', async(request,response) =>{
+    response.render('signUp');
+})
 
 /** The Project List view */
 app.get('/projectList',async(request,response) =>{

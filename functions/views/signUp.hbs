@@ -22,8 +22,8 @@
 				min-height: 100%;
 				margin-bottom: -50px;
 			}
-			.login-container{
-				min-height: 66%;
+			.signup-container{
+				min-height: 75%;
 				margin-bottom: 0px;
 			}
 			.internal-top-row, .internal-email-row {
@@ -43,80 +43,62 @@
     	<div class="container mainView">
     		<div class="row empty-row mb-4">
     		</div>
-    		<!-- Begin login-container row-->
-    		<div class="row login-container mt-4">
+    		<!-- Begin signup row-->
+    		<div class="row signup-container mt-4">
     			<!-- Begin empty left col-->
 	    		<div class="col empty-col">
 	    		</div>
 				<!-- End empty left col-->
 
-    			<!-- Begin login-box container-->
-				<div class="login-box container col-4 border barder-dark">
+    			<!-- Begin signup-box container-->
+				<div class="signup-box col-4 border barder-dark">
 
-						<!-- Begin internal login top row -->
+						<!-- Begin signup top row -->
 						<div class="row internal-top-row">
 						</div>
 						<!-- End internal login top row -->
 
-						<div class="row internal-google-row mb-2">
+						<!-- Begin logo row -->
+						<div class="row">
 							<div class="col-1">
 							</div>
 							<div class="col">
 								<h1 class="text-center"><a href="/">mypmwork.com</a></h1>
 							</div>
 						</div>
-						<div class="row mt-4 d-flex justify-content-center">
-							<div class="g-signin2" style="width:275" data-onsuccess="onSignIn" data-theme="light"></div>
+						<!-- End logo row-->
+						<div class="row mt-2 mb-2">
+							<form class="col ml-2 mb-4">
+								<div class="form-group">
+									<label for="inputFirstName">First Name</label>
+									<input type="text" class="form-control" id="inputFirstName" placeholder="Enter First Name" required>
+								</div>
+								<div class="form-group">
+									<label for="inputLastName">Last Name</label>
+									<input type="text" class="form-control" id="inputLastName" placeholder="Enter Last Name" required>
+								</div>
+							  	<div class="form-group">
+							    	<label for="inputEmail">Gmail address</label>
+							    	<input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email" required>
+								</div>
+							  	<button type="submit" class="btn btn-primary" name="signUp">Sign Up</button>
+							</form>
 						</div>
-						<!-- The surrounding HTML is left untouched by FirebaseUI.
-		     			Your app may use that space for branding, controls and other customizations.-->
-					    <script>
-					      function onSignIn(googleUser) {
-					        // Useful data for your client-side scripts:
-					        var profile = googleUser.getBasicProfile();
-					        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-					        console.log('Full Name: ' + profile.getName());
-					        console.log('Given Name: ' + profile.getGivenName());
-					        console.log('Family Name: ' + profile.getFamilyName());
-					        console.log("Image URL: " + profile.getImageUrl());
-					        console.log("Email: " + profile.getEmail());
-
-					        // The ID token you need to pass to your backend:
-					        var id_token = googleUser.getAuthResponse().id_token;
-					        console.log("ID Token: " + id_token);
-					      }
-					    </script>
-					    <!-- Begin internal-email-row -->
-						<div class="row internal-email-row mb-2 pt-4">
+						<div class="row mb-0 pt-4">
 							<div class="col-1">
 							</div>
 							<div class="col">
-								<p class="text-center" style="font-size:12">Don't have an account? <a href='/signUp'>Sign up</a></p>
+								<p class="text-center" style="font-size:12">Already have an account? <a href='/'>Sign in</a></p>
 							</div>
 						</div>
-						<!-- End internal email-row -->
-						<!-- Begin empty row -->
-						<div class="row mb-4 empty-row">
-						</div>
-						<!-- End empty row -->
-						<!-- Begin terms-row -->
-						<div class="row terms-row">
-							<div class="col-1 mr-0 mt-4 empty-col">
-							</div>
-							<div class="col ml-0 mr-0 mt-4">
-								<p class="" style="font-size:10">This site is protected by the Google <a href="#">privacy policy</a> and</br><a href="#"> Terms of Service apply</a></p>
-							</div>
-						</div>
-						<!-- End terms-row -->
 				</div>
-				<!-- End login-box container -->
-				
+				<!-- End signup-box container -->
 				<!-- Begin empty right col-->
 				<div class="col empty-col">
 				</div>
 				<!-- End empty right col-->
     		</div>		
-			<!-- End login-container row-->
+			<!-- End signup container-->
 		</div>
 		<!-- End mainView -->
 		<!-- Begin Footer -->
