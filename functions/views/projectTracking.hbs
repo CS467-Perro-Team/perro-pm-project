@@ -7,6 +7,12 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<!-- Latest highcharts scripts -->
+		<script src="https://code.highcharts.com/highcharts.js"></script>
+		<script src="https://code.highcharts.com/modules/series-label.js"></script>
+		<script src="https://code.highcharts.com/modules/exporting.js"></script>
+		<script src="https://code.highcharts.com/modules/export-data.js"></script>
+		<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 		<style>
 			html, body{
 				height: 100%;
@@ -21,6 +27,40 @@
 			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
 			a {color: black !important;}
+			/*Highcharts CSS*/
+			.highcharts-figure, .highcharts-data-table table {
+			    min-width: 360px; 
+			    max-width: 800px;
+			    margin: 1em auto;
+			}
+
+			.highcharts-data-table table {
+				font-family: Verdana, sans-serif;
+				border-collapse: collapse;
+				border: 1px solid #EBEBEB;
+				margin: 10px auto;
+				text-align: center;
+				width: 100%;
+				max-width: 500px;
+			}
+			.highcharts-data-table caption {
+			    padding: 1em 0;
+			    font-size: 1.2em;
+			    color: #555;
+			}
+			.highcharts-data-table th {
+				font-weight: 600;
+			    padding: 0.5em;
+			}
+			.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+			    padding: 0.5em;
+			}
+			.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+			    background: #f8f8f8;
+			}
+			.highcharts-data-table tr:hover {
+			    background: #f1f7ff;
+			}
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
@@ -62,7 +102,7 @@
 	    		</div>
 				<div class="col-4 pt-4">
       				<button id="projectSummaryButton" class="button pr-1"><a href="/projectSummary">Summary</a></button>
-      				<button id="projectTrackingButton" class="button pl-1" style="background:#95BCF2; color:black !important"><a href="/projectTracking">Tracking</a></button>
+      				<button id="projectTrackingButton" class="button pl-1" style="background:#417DB5; color:black !important"><a href="/projectTracking">Tracking</a></button>
 				</div>
 				<div class="col-1 empty-container">
 				</div>
@@ -72,12 +112,67 @@
 			</div>
 		</div>
     	<!-- End User Info Container -->
-
+    	<script>
+    		document.addEventListener('DOMContentLoaded', function(){
+    			Highcharts.chart('highchart-container', {
+			    title: {
+			        text: '{{dbProjects.projectName}}'
+			    },
+			    yAxis: {
+			        title: {
+			            text: 'Days of Effort'
+			        }
+			    },
+			    xAxis: {
+			        accessibility: {
+			            rangeDescription: 'Range: {{dbProjects.startDate}} to {{dbProjects.dueDate}}'
+			        }
+			    },
+			    legend: {
+			        layout: 'vertical',
+			        align: 'right',
+			        verticalAlign: 'middle'
+			    },
+			    plotOptions: {
+			        series: {
+			            label: {
+			                connectorAllowed: false
+			            },
+			            pointStart: {{dbProjects.startDate}}
+			        }
+			    },
+			    series: [{
+			        name: 'Progress',
+			        data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+			    }, {
+			        name: 'Remaining',
+			        data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+			    }, {
+			        name: 'Total',
+			        data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
+			    }],
+			    responsive: {
+			        rules: [{
+			            condition: {
+			                maxWidth: 300
+			            },
+			            chartOptions: {
+			                legend: {
+			                    layout: 'horizontal',
+			                    align: 'center',
+			                    verticalAlign: 'bottom'
+			                }
+			            }
+			        }]
+			    }
+			});
+    	});
+    	</script>
     	<!-- Begin Main View Container -->
 		<div class="mainView container pt-2">
 			<div class="row pr-3 pl-3">
 				<div class="col-4 border border-dark pr-5 mr-0">
-					<h3 class="pt-1">Project Task List</h3>
+					<h3 class="pt-1" style="color:#417DB5">Project</h3>
 		      		<ul class="l">
 		      			<li class="">{{dbProjects.projectName}}</li>
 		      			<ul class="">
@@ -88,7 +183,13 @@
 		      		</ul>
 	      		</div>
 	      		<div id="projVisualization" class="col border border-dark ml-3 mr-0">
-	      			Data Visualization Table to go here...
+	      			<figure class="highcharts-figure">
+				    <div id="highchart-container"></div>
+				    <p class="highcharts-description">
+				        Basic line chart showing the progress of the project. Start date: {{dbProjects.startDate}} to {{dbProjects.dueDate}}
+				    </p>
+				</figure>
+
 	      		</div>
 	      	</div>
       	</div>
