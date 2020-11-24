@@ -95,7 +95,8 @@
 							xhr.onload = function() {
 								console.log('Signed in as: ' + xhr.responseText)
 							}
-							xhr.send('idtoken= ' + id_token)
+							//xhr.send('idtoken= ' + id_token)
+							xhr.send(id_token)
 					      }
 						  // send the ID token to the server
 						  //const xhr = new XMLHttpRequest();

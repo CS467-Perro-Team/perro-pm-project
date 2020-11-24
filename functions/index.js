@@ -270,16 +270,26 @@ app.get('/siteMap',(request,response) =>{
 
 
 // handling authentication token
-async function verify(token, userID) {
-    const ticket = await client.verifyIdToken({
+const userAccount = {
+    userID: null
+}
+
+
+async function verify(token) {
+    ////console.log("IN VERIFY FUNCTION >>>>>>>");
+    /*const ticket = await client.verifyIdToken({
         idToken: token,
         audience: CLIENT_ID
-    })
-    const payload = ticket.payload();
-    userID = payload["sub"];
-    console.log("The user ID is: "); ///////////////////////////////////////
-    console.log(userID); //////////////////////////////////////////////
+    }) */
+    //////console.log("IN VERIFY FUNCTION>>>>>>>");
+    //const payload = ticket.payload();
+    /////console.log("Here's PAYLOAD:", payload);
+    //userAccount.userID = payload["sub"];
+    /////console.log("THE USER ID IS: "); ///////////////////////////////////////
+    /////console.log(userAccount.userID); //////////////////////////////////////////////
+    /////////console.log("END OF VERIFY function");
     // return userID
+    console.log("It's verified YAH!!!!!")
 } 
 
 
@@ -287,13 +297,10 @@ app.post('/tokensignin', function(request, response) {
     let token = request.body
     console.log("SERVER - HERE IS THE TOKEN:")
     console.log(token);
-    const aUser = {
-        id: null
-    }
     // verify the token
-    verify(token, aUser.id).catch(console.error);
-    console.log(aUser.id); ///////////////////////////////////////////////
-    //return response.redirect("/projectList")
-    return response.send("Token IS Verified")
+    verify(token).catch(console.error);
+    console.log(userAccount.userID); ///////////////////////////////////////////////
+    return response.redirect("/signUp")
+    //return response.send("Token IS Verified")
 })
 exports.app = functions.https.onRequest(app);
