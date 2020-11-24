@@ -11,6 +11,8 @@ const {OAuth2Client} = require('google-auth-library');
 const app = express();
 const CLIENT_ID = "610981118515-qjg25168rofh9s2bkf6ec53lk46sp4vn.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
+/////////console.log("This is the client:");
+////////////console.log(client) ////////////////////////////////////////////////////
 //Set engine as handlebars
 app.engine('hbs', engines.handlebars);
 //Front end code will be in views folder
@@ -58,6 +60,8 @@ const insertData = async (collectionName, docName, data) => {
         await firestoreCon.collection(collectionName).doc(docName).set(data);
     }
 }
+
+
 /*
 @desc Retrieves data from the database by requesting the collection and the document
 @param  collectionName - The name of a collection in Firestore DB
@@ -112,7 +116,7 @@ async function getTaskListFromAProject(projectName) {
 @return string - the role of a specific user
 */
 const userRoles = (aUser) => {
-    const permissions = aUser.Permission;
+    const permissions = aUser.permission;
     let result;
     if (permissions.projectCreator) {
         result = "Project Manager";
@@ -126,31 +130,37 @@ const userRoles = (aUser) => {
 
 
 /** Routes */
-app.get('/', (request, response) => {//will be login page
-    /*const dbProjects = await getFirestore('Projects', 'project');
-    const dbUser = await getFirestore('Users', 'user');
-    const dbTasks = await getFirestore('Tasks','task1');
-    const userRole = userRoles(dbUser);
-    response.render('index', {dbProjects, dbUser, userRole,dbTasks});
-    */
-    response.render('index')
+// app.post('/tokensignin', function(request, response) {
+//     let token = request.body
+//     console.log("SERVER - HERE IS THE TOKEN:")
+//     console.log(token)
+//     // verify the token
+//     verify(token).catch(console.error);
+//     return response.redirect("/projectList")
+// })
+
+app.get('/', async(request, response) => {//will be login page
+    response.render('index');
 });
 
 app.get('/task',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const dbTasks = await getFirestore('Tasks','task1');
     const dbComments = await getFirestore('Comments','comment1');
     const userRole = userRoles(dbUser);
     response.render('task',{dbProjects,dbUser,userRole,dbTasks,dbComments});
 });
 
+
 app.get('/createTask',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const userRole =userRoles(dbUser);
     response.render('createTask',{dbProjects,dbUser,userRole});
 });
+
+
 app.post('/createTask', (request, response) =>{
     let data = request.body;
     // add the empty team array to the project
@@ -159,6 +169,8 @@ app.post('/createTask', (request, response) =>{
     //insertData("Projects", data.projectName, data);
     response.redirect("/task");
 });
+
+
 // create an object for the table in project list view
 const createObjectForProjectListView = (projName, taskList) => {
         let totalTasks = taskList.length;
@@ -187,9 +199,16 @@ const createObjectForProjectListView = (projName, taskList) => {
         return projectListView;
 }
 
+
+/** The Sign Up View*/
+app.get('/signUp', async(request,response) =>{
+    response.render('signUp');
+})
+
+
 /** The Project List view */
 app.get('/projectList',async(request,response) =>{
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const userRole =userRoles(dbUser);
     const projectList = await getCollection('Projects');
     let projectRows = {};
@@ -206,30 +225,34 @@ app.get('/projectList',async(request,response) =>{
     response.render('projectList',{dbUser,userRole,projectTable});
 });
 
+
 /** The Single Project Summary view */
 app.get('/projectSummary',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');  //add reference for chosen project
-    const dbUser = await getFirestore('Users','user'); // add variable to pull in user logged in
+    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
     const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole = userRoles(dbUser);
     response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
 });
 
+
 /** The Single Project Tracking view */
 app.get('/projectTracking',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project'); //add reference for chosen project
-    const dbUser = await getFirestore('Users','user'); // add variable to pull in user logged in
+    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
     const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole =userRoles(dbUser);
     response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
 });
 
+
 /** The Create Project List view */
 app.get('/createProject',async(request,response) =>{
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const userRole =userRoles(dbUser);
     response.render('createProject',{dbUser,userRole});
 });
+
 
 app.post('/createProject', (request, response) =>{
     let data = request.body;
@@ -240,26 +263,37 @@ app.post('/createProject', (request, response) =>{
     response.redirect("/projectList");
 });
 
+
 app.get('/siteMap',(request,response) =>{
     response.render('siteMap');
 });
 
+
 // handling authentication token
-async function verify(token) {
-    const ticket = await client.verifyIDToken({
+async function verify(token, userID) {
+    const ticket = await client.verifyIdToken({
         idToken: token,
         audience: CLIENT_ID
     })
     const payload = ticket.payload();
-    const userID = payload["sub"]
+    userID = payload["sub"];
+    console.log("The user ID is: "); ///////////////////////////////////////
+    console.log(userID); //////////////////////////////////////////////
+    // return userID
 } 
+
 
 app.post('/tokensignin', function(request, response) {
     let token = request.body
     console.log("SERVER - HERE IS THE TOKEN:")
-    console.log(token)
+    console.log(token);
+    const aUser = {
+        id: null
+    }
     // verify the token
-    verify(token).catch(console.error);
-    return response.end("done")
+    verify(token, aUser.id).catch(console.error);
+    console.log(aUser.id); ///////////////////////////////////////////////
+    //return response.redirect("/projectList")
+    return response.send("Token IS Verified")
 })
 exports.app = functions.https.onRequest(app);

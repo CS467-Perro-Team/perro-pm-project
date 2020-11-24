@@ -45,7 +45,7 @@
     	<div class="container mainView">
     		<div class="row empty-row mb-4">
     		</div>
-    		<!-- Begin login row-->
+    		<!-- Begin login-container row-->
     		<div class="row login-container mt-4">
     			<!-- Begin empty left col-->
 	    		<div class="col empty-col">
@@ -67,16 +67,14 @@
 								<h1 class="text-center"><a href="/">mypmwork.com</a></h1>
 							</div>
 						</div>
-						<div class="row mt-2">
-							<div class="col-1">
-							</div>
-							<div class="col">
-								<div class="g-signin2" style="width:275"data-onsuccess="onSignIn" data-theme="light"></div>
-							</div>
+						<div class="row mt-4 d-flex justify-content-center">
+							<div class="g-signin2" style="width:275" data-onsuccess="onSignIn" data-theme="light"></div>
 						</div>
 						<!-- The surrounding HTML is left untouched by FirebaseUI.
 		     			Your app may use that space for branding, controls and other customizations.-->
 					    <script>
+							//const TARGET_URL = "http://localhost:5000/tokensignin";
+							const TARGET_URL = window.location.origin + "/tokensignin";
 					      function onSignIn(googleUser) {
 					        // Useful data for your client-side scripts:
 					        var profile = googleUser.getBasicProfile();
@@ -92,7 +90,7 @@
 					        console.log("ID Token: " + id_token);
 							// send the ID token to the server
 							const xhr = new XMLHttpRequest();
-							xhr.open('POST', "http://localhost:5000/tokensignin");
+							xhr.open('POST', TARGET_URL);
 							xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 							xhr.onload = function() {
 								console.log('Signed in as: ' + xhr.responseText)
@@ -108,31 +106,37 @@
 						  //}
 						  //xhr.send('idtoken= ' + id_token) 
 					    </script>
-							<!-- End empty right col-->
-						<div class="row internal-email-row mb-0 pt-4">
+					    <!-- Begin internal-email-row -->
+						<div class="row internal-email-row mb-2 pt-4">
 							<div class="col-1">
 							</div>
 							<div class="col">
-								<p class="text-center" style="font-size:12">Don't have an account? <a href='/projectList'>Sign up</a></p>
+								<p class="text-center" style="font-size:12">Don't have an account? <a href='/signUp'>Sign up</a></p>
 							</div>
 						</div>
-						<div class="row">
+						<!-- End internal email-row -->
+						<!-- Begin empty row -->
+						<div class="row mb-4 empty-row">
 						</div>
-						<div class="row">
-							<div class="col-1 mr-0">
+						<!-- End empty row -->
+						<!-- Begin terms-row -->
+						<div class="row terms-row">
+							<div class="col-1 mr-0 mt-4 empty-col">
 							</div>
-							<div class="col ml-0 mr-0">
+							<div class="col ml-0 mr-0 mt-4">
 								<p class="" style="font-size:10">This site is protected by the Google <a href="#">privacy policy</a> and</br><a href="#"> Terms of Service apply</a></p>
 							</div>
 						</div>
+						<!-- End terms-row -->
 				</div>
 				<!-- End login-box container -->
+				
 				<!-- Begin empty right col-->
 				<div class="col empty-col">
 				</div>
 				<!-- End empty right col-->
     		</div>		
-			<!-- End login row-->
+			<!-- End login-container row-->
 		</div>
 		<!-- End mainView -->
 		<!-- Begin Footer -->
@@ -146,7 +150,7 @@
 
 	    		<!-- Begin Middle column -->
 				<div class="col-6">
-					<ul class="nav">
+					<ul class="nav justify-content-center">
 						<li class="nav-item"><a class="nav-link" href="/">mypmwork.com</a></li>
 						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
 						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
