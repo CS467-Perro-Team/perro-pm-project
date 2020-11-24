@@ -109,7 +109,7 @@ async function getTaskListFromAProject(projectName) {
 @return string - the role of a specific user
 */
 const userRoles = (aUser) => {
-    const permissions = aUser.Permission;
+    const permissions = aUser.permission;
     let result;
     if (permissions.projectCreator) {
         result = "Project Manager";
@@ -125,7 +125,7 @@ const userRoles = (aUser) => {
 /** Routes */
 app.get('/', async(request, response) => {//will be login page
     const dbProjects = await getFirestore('Projects', 'project');
-    const dbUser = await getFirestore('Users', 'user');
+    const dbUser = await getFirestore('Users', 'BarnesH');
     const dbTasks = await getFirestore('Tasks','task1');
     const userRole = userRoles(dbUser);
     response.render('index', {dbProjects, dbUser, userRole,dbTasks});
@@ -133,7 +133,7 @@ app.get('/', async(request, response) => {//will be login page
 
 app.get('/task',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const dbTasks = await getFirestore('Tasks','task1');
     const dbComments = await getFirestore('Comments','comment1');
     const userRole = userRoles(dbUser);
@@ -142,7 +142,7 @@ app.get('/task',async(request,response) =>{
 
 app.get('/createTask',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const userRole =userRoles(dbUser);
     response.render('createTask',{dbProjects,dbUser,userRole});
 });
@@ -188,7 +188,7 @@ app.get('/signUp', async(request,response) =>{
 
 /** The Project List view */
 app.get('/projectList',async(request,response) =>{
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const userRole =userRoles(dbUser);
     const projectList = await getCollection('Projects');
     let projectRows = {};
@@ -208,7 +208,7 @@ app.get('/projectList',async(request,response) =>{
 /** The Single Project Summary view */
 app.get('/projectSummary',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');  //add reference for chosen project
-    const dbUser = await getFirestore('Users','user'); // add variable to pull in user logged in
+    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
     const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole = userRoles(dbUser);
     response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
@@ -217,7 +217,7 @@ app.get('/projectSummary',async(request,response) =>{
 /** The Single Project Tracking view */
 app.get('/projectTracking',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project'); //add reference for chosen project
-    const dbUser = await getFirestore('Users','user'); // add variable to pull in user logged in
+    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
     const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
     const userRole =userRoles(dbUser);
     response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
@@ -225,7 +225,7 @@ app.get('/projectTracking',async(request,response) =>{
 
 /** The Create Project List view */
 app.get('/createProject',async(request,response) =>{
-    const dbUser = await getFirestore('Users','user');
+    const dbUser = await getFirestore('Users','BarnesH');
     const userRole =userRoles(dbUser);
     response.render('createProject',{dbUser,userRole});
 });
