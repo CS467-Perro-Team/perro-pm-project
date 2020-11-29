@@ -24,7 +24,7 @@
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
-    <body class="container" onload="tempSolution()">
+    <body class="container">
 
 		<!-- Begin Header Container-->
     	<div class="container">
@@ -37,7 +37,7 @@
   			</div>
     		<div class="row justify-content-lg-center">
 				<div class="col col-lg-auto pt-0">
-			  		<h1>{{dbProjects.projectName}}</h1>
+			  		<h1>Project List</h1>
 		  		</div>
 		  	</div>
     	</div>
@@ -50,13 +50,13 @@
 					<div class="row pt-2">
 						<div class="col">
 							<span class="font-weight-bold">Username</span>
-							<span id="username">{{dbUser.login.username}}</span>
+							<span id="username">{{dbUser.username}}</span>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col">
 	    					<span class="font-weight-bold">Role</span>
-	    					<span id="userRoll">{{userRole}}</span>
+	    					<span id="userRoll">{{dbUser.userrole}}</span>
 	    				</div>
 	    			</div>	
 	    		</div>
@@ -126,7 +126,7 @@
 						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
 						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
 						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
-						<li class="nav-item"><a class="nav-link" href="#" onclick="signOut();">sign out</a></li>
+						<li class="nav-item"><a class="nav-link" href="/logout">sign out</a></li>
 					</ul>
 	    		</div>
 	    		<!-- End Middle column -->
