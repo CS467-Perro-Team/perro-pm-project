@@ -30,6 +30,7 @@
 				min-height: 25%
 			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
+
 		</style>
 		<meta name="robots" content="noindex nofollow">
 		<meta name="google-signin-scope" content="profile email">
@@ -67,12 +68,19 @@
 								<h1 class="text-center"><a href="/">mypmwork.com</a></h1>
 							</div>
 						</div>
-						<div class="row mt-4 d-flex justify-content-center">
+						{{!-- <div class="row mt-4 d-flex justify-content-center">
 							<div class="g-signin2" style="width:275" data-onsuccess="onSignIn" data-theme="light"></div>
+						</div> --}}
+						<div class="row mt-4 d-flex justify-content-center">
+							{{!-- <form action="" method="GET"> --}}
+							  	{{!-- <button type="submit" class="btn btn-primary" name="signIn">Sign In</button> --}}
+							  	<a href={{loginLink}} class="btn btn-primary" name="signIn">Sign In</button>
+							{{!-- </form> --}}
 						</div>
 						<!-- The surrounding HTML is left untouched by FirebaseUI.
 		     			Your app may use that space for branding, controls and other customizations.-->
 					    <script>
+						/*	
 							//const TARGET_URL = "http://localhost:5000/tokensignin";
 							const TARGET_URL = window.location.origin + "/tokensignin";
 					      function onSignIn(googleUser) {
@@ -105,7 +113,8 @@
 						  //xhr.onload = function() {
 							//  console.log('Signed in as: ' + xhr.responseText)
 						  //}
-						  //xhr.send('idtoken= ' + id_token) 
+						  //xhr.send('idtoken= ' + id_token)
+						  */ 
 					    </script>
 					    <!-- Begin internal-email-row -->
 						<div class="row internal-email-row mb-2 pt-4">
@@ -114,7 +123,7 @@
 							<div class="col">
 								<p class="text-center" style="font-size:12">Don't have an account? <a href='/signUp'>Sign up</a></p>
 							</div>
-						</div>
+						</div> 
 						<!-- End internal email-row -->
 						<!-- Begin empty row -->
 						<div class="row mb-4 empty-row">
@@ -126,6 +135,7 @@
 							</div>
 							<div class="col ml-0 mr-0 mt-4">
 								<p class="" style="font-size:10">This site is protected by the Google <a href="#">privacy policy</a> and</br><a href="#"> Terms of Service apply</a></p>
+								<p class="" style="font-size:10"> <a href="#"></a></br><a href="#"></a></p>
 							</div>
 						</div>
 						<!-- End terms-row -->

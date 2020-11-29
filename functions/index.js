@@ -4,15 +4,27 @@ const engines = require('consolidate');
 const hbs = require('handlebars');
 const admin = require('firebase-admin');
 const getMySecretKey = require('./secretKey');  // Comment out for deploy to firebase hosted domain
-const { request, response } = require('express');
+/////////////const { request, response } = require('express');
 const bodyParser = require('body-parser');
-const {OAuth2Client} = require('google-auth-library');
+const { google } = require('googleapis');
+const oauth2 = google.oauth2('v2');
+const CONFIG = require('./config');
+/*
+**** DELETE THIS COMMENT WHEN YOU'VE COMPLETED THE FOLLOWING INSTRUCTIONS:
+for "const CONFIG = require('./config')"  to work you need to...
+1.  Create a config.js file in the functions directory
+2.  In config.js file write this code:
+    module.exports = {
+        CLIENT_ID: "your client id here",
+        CLIENT_SECRET: "your client secret here",
+        REDIRECT_URL: "your redirect url here"
+    }
+3.  You need to do step 1 to step 2 in order for the google OAuth2 to work
+*/
+
 
 const app = express();
-const CLIENT_ID = "610981118515-qjg25168rofh9s2bkf6ec53lk46sp4vn.apps.googleusercontent.com";
-const client = new OAuth2Client(CLIENT_ID);
-/////////console.log("This is the client:");
-////////////console.log(client) ////////////////////////////////////////////////////
+const SCOPE = "https://www.googleapis.com/auth/userinfo.profile"
 //Set engine as handlebars
 app.engine('hbs', engines.handlebars);
 //Front end code will be in views folder
@@ -130,18 +142,41 @@ const userRoles = (aUser) => {
 
 
 /** Routes */
-// app.post('/tokensignin', function(request, response) {
-//     let token = request.body
-//     console.log("SERVER - HERE IS THE TOKEN:")
-//     console.log(token)
-//     // verify the token
-//     verify(token).catch(console.error);
-//     return response.redirect("/projectList")
-// })
+/*** USER AUTHENTICATION ***/
+const oauth2Client = new google.auth.OAuth2(
+    CONFIG.CLIENT_ID,
+    CONFIG.CLIENT_SECRET,
+    CONFIG.REDIRECT_URL
+);
 
 app.get('/', async(request, response) => {//will be login page
-    response.render('index');
+    const loginLink = oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: SCOPE
+    })
+    response.render('index', {loginLink});
 });
+
+// The redirect URL
+
+app.get('/oauth2callback', async(request, response) => {
+    const { tokens } = await oauth2Client.getToken(request.query.code);
+    oauth2Client.setCredentials(tokens)
+    // get user info and verify it with DB
+    const userInfo = await oauth2.userinfo.get({auth: oauth2Client})
+    ////console.log(tokens) /////////////////
+    ///////console.log("USER INFO:\n", userInfo)
+    const dataID = userInfo.data.id
+    //////console.log("Data ID>>>>", dataID) //////////
+    // try to get the current user from the DB
+    const usersRef = firestoreCon.collection('Users').doc(dataID)
+    currentUser = await usersRef.get()
+    if (!currentUser.exist) {
+        response.redirect("/signUp")
+    }
+    response.redirect("/projectList")
+})
+
 
 app.get('/task',async(request,response) =>{
     const dbProjects = await getFirestore('Projects','Better Firestore Project');
@@ -274,33 +309,4 @@ const userAccount = {
     userID: null
 }
 
-
-async function verify(token) {
-    ////console.log("IN VERIFY FUNCTION >>>>>>>");
-    /*const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID
-    }) */
-    //////console.log("IN VERIFY FUNCTION>>>>>>>");
-    //const payload = ticket.payload();
-    /////console.log("Here's PAYLOAD:", payload);
-    //userAccount.userID = payload["sub"];
-    /////console.log("THE USER ID IS: "); ///////////////////////////////////////
-    /////console.log(userAccount.userID); //////////////////////////////////////////////
-    /////////console.log("END OF VERIFY function");
-    // return userID
-    console.log("It's verified YAH!!!!!")
-} 
-
-
-app.post('/tokensignin', function(request, response) {
-    let token = request.body
-    console.log("SERVER - HERE IS THE TOKEN:")
-    console.log(token);
-    // verify the token
-    verify(token).catch(console.error);
-    console.log(userAccount.userID); ///////////////////////////////////////////////
-    return response.redirect("/signUp")
-    //return response.send("Token IS Verified")
-})
 exports.app = functions.https.onRequest(app);
