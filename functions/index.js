@@ -1,47 +1,130 @@
+// Setup
 const functions = require('firebase-functions');
-const express = require('express');
-const engines = require('consolidate');
-const hbs = require('handlebars');
 const admin = require('firebase-admin');
-const getMySecretKey = require('./secretKey');  // Comment out for deploy to firebase hosted domain
-const { request, response } = require('express');
-const bodyParser = require('body-parser');
-
-const app = express();
-//Set engine as handlebars
-app.engine('hbs', engines.handlebars);
-//Front end code will be in views folder
-app.set('views', './views');
-//Views will be hbs files
-app.set('view engine', 'hbs');
-//Parses incoming request bodies
-app.use(bodyParser.json());
-
+// Credentialed setup
 /*Replacement code for deploying to firebase hosted site*/
 //Authorize your application to access your Firestore DB
 //admin.initializeApp(functions.config().firebase);
 /*Replacement code for deploying to firebase hosted site*/
 
-
-//Replace this code block with replacement code above if deploying to firebase hosted domain
+//Replace this code block with replacement code above
 // set up authentication with local environment
+const getMySecretKey = require('./secretKey');  // You need to make your own module
 const serviceAccount = require(getMySecretKey());
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://perro-pm-project.firebaseio.com"
 });
-//Replace this code block with replacement code above
-
+//Replace this code block with replacement code above*/
 const firestoreCon = admin.firestore();
 
-const giveAListOfDocuments = (collection) => {
-    const listOfDocs = [];
-    collection.forEach( doc => {
-        listOfDocs.push(doc.data());
-    })
-    return listOfDocs;
+const bodyParser = require('body-parser');
+
+// Express Setup
+const express = require('express');
+const session = require('express-session');
+const { request, response } = require('express');
+// Initialize the app using express.
+const app = express();
+
+// Handlebars Setup
+const engines = require('consolidate');
+const hbs = require('handlebars');
+//Set engine as handlebars
+app.engine('hbs', engines.handlebars);
+
+// Front end code will be in views folder
+app.set('views', './views');
+
+//Views will be hbs files
+app.set('view engine', 'hbs');
+
+
+// Config
+const CONFIG = require('./config.js');
+const G_CID = CONFIG.client_id;
+const G_CSEC = CONFIG.client_secret;
+const SECRET = CONFIG.session_secret;
+
+// Google OAuth
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client(G_CID);
+
+// Session Setup
+var sessionStuff = {
+    secret: SECRET,
+    resave: true,
+    cookie:{
+        //7 days
+        maxAge: 24*60*60*7*1000
+    }
 }
+//console.log(sessionStuff);
+
+app.set('trust proxy',1);
+app.use(session(sessionStuff));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+//Login Page
+app.get('/', (request, response) => {
+    if(request.session.views) {
+        request.session.views++;
+        response.render('projectList', {G_CID});
+    } else {
+        request.session.views = 1;
+    }
+    console.log(session.views);
+    response.render('index', {G_CID});
+});
+
+//const port = process.env.PORT || 3000;
+//app.listen(port , () => console.log('App listening on port ' + port));
+
+// Passport Setup
+const passport = require('passport');
+var userProfile;
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+app.get('/success', (request, response) => 
+    //response.send(userProfile)
+    response.redirect("projectList")
+);
+app.get('/error', (request, response) => 
+    response.render("error", "error logging in")
+);
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
+
+/*  Passport-Google AUTH  */
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+passport.use(new GoogleStrategy({
+    clientID: G_CID,
+    clientSecret: G_CSEC,
+    callbackURL: "http://localhost:5000/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+      userProfile=profile;
+      return done(null, userProfile);
+  }
+));
+ 
+app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+ 
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
+    // Successful authentication, redirect success.
+    response.redirect("/projectList");
+});
 
 
 /**  Query functions  **/
@@ -54,6 +137,13 @@ const insertData = async (collectionName, docName, data) => {
     } else {
         await firestoreCon.collection(collectionName).doc(docName).set(data);
     }
+}
+const giveAListOfDocuments = (collection) => {
+    const listOfDocs = [];
+    collection.forEach( doc => {
+        listOfDocs.push(doc.data());
+    })
+    return listOfDocs;
 }
 /*
 @desc Retrieves data from the database by requesting the collection and the document
@@ -77,7 +167,6 @@ async function getFirestore(collectionName, docName) {
     return result
 }
 
-
 async function getCollection(collectionName) {
     const collectRef = firestoreCon.collection(collectionName);
     const docList = await collectRef.get();
@@ -87,7 +176,6 @@ async function getCollection(collectionName) {
     })
     return listOfDocs;
 }
-
 
 async function getTaskListFromAProject(projectName) {
     const projectsRef = firestoreCon.collection('Projects');
@@ -102,54 +190,6 @@ async function getTaskListFromAProject(projectName) {
     return taskList;
 }
 
-
-/*
-@desc  Determines the role of a user (project manager, project participant, or stakeholder) based on permission values
-@param aUser - the document that contains a specific user's data
-@return string - the role of a specific user
-*/
-const userRoles = (aUser) => {
-    const permissions = aUser.permission;
-    let result;
-    if (permissions.projectCreator) {
-        result = "Project Manager";
-    } else if (permissions.taskCreator && !permissions.projectCreator){
-        result = "Project Participant";
-    } else {
-        return "Stakeholder";
-    }
-    return result;
-}
-
-
-/** Routes */
-app.get('/', async(request, response) => {//will be login page
-    response.render('index');
-});
-
-app.get('/task',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','BarnesH');
-    const dbTasks = await getFirestore('Tasks','task1');
-    const dbComments = await getFirestore('Comments','comment1');
-    const userRole = userRoles(dbUser);
-    response.render('task',{dbProjects,dbUser,userRole,dbTasks,dbComments});
-});
-
-app.get('/createTask',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','BarnesH');
-    const userRole =userRoles(dbUser);
-    response.render('createTask',{dbProjects,dbUser,userRole});
-});
-app.post('/createTask', (request, response) =>{
-    let data = request.body;
-    // add the empty team array to the project
-    data["team"] = [];
-    // add the data to the database
-    //insertData("Projects", data.projectName, data);
-    response.redirect("/task");
-});
 // create an object for the table in project list view
 const createObjectForProjectListView = (projName, taskList) => {
         let totalTasks = taskList.length;
@@ -177,15 +217,14 @@ const createObjectForProjectListView = (projName, taskList) => {
         }
         return projectListView;
 }
-/** The Sign Up View*/
-app.get('/signUp', async(request,response) =>{
-    response.render('signUp');
-})
 
-/** The Project List view */
-app.get('/projectList',async(request,response) =>{
-    const dbUser = await getFirestore('Users','BarnesH');
-    const userRole =userRoles(dbUser);
+/** Routes */
+/** The Project List view **/
+app.get('/projectList',async(request,response) => {
+    console.log("sessionID: " + request.sessionID);
+    var useremail = userProfile._json.email;
+    console.log(useremail);
+    const dbUser = await getFirestore('Users',useremail);
     const projectList = await getCollection('Projects');
     let projectRows = {};
     const projectTable = [];
@@ -198,35 +237,19 @@ app.get('/projectList',async(request,response) =>{
         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
         projectTable.push(projectRows);
     }
-    response.render('projectList',{dbUser,userRole,projectTable});
+    response.render('projectList',{dbUser,projectTable});
 });
 
-/** The Single Project Summary view */
-app.get('/projectSummary',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','Better Firestore Project');  //add reference for chosen project
-    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
-    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
-    const userRole = userRoles(dbUser);
-    response.render('projectSummary',{dbProjects,dbUser,userRole,dbTasks});
-});
-
-/** The Single Project Tracking view */
-app.get('/projectTracking',async(request,response) =>{
-    const dbProjects = await getFirestore('Projects','Better Firestore Project'); //add reference for chosen project
-    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
-    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
-    const userRole =userRoles(dbUser);
-    response.render('projectTracking',{dbProjects,dbUser,userRole,dbTasks});
-});
-
-/** The Create Project List view */
-app.get('/createProject',async(request,response) =>{
+/** The Create Project View **/
+app.get('/createProject',async(request,response) => {
+    console.log("sessionID: " + request.sessionID);
     const dbUser = await getFirestore('Users','BarnesH');
-    const userRole =userRoles(dbUser);
-    response.render('createProject',{dbUser,userRole});
+    response.render('createProject',{dbUser});
 });
 
-app.post('/createProject', (request, response) =>{
+/** Create Project Functionality **/
+app.post('/createProject', (request, response) => {
+    console.log("sessionID: " + request.sessionID);
     let data = request.body;
     // add the empty team array to the project
     data["team"] = [];
@@ -235,7 +258,82 @@ app.post('/createProject', (request, response) =>{
     response.redirect("/projectList");
 });
 
-app.get('/siteMap',(request,response) =>{
-    response.render('siteMap');
+/** Create Task View **/
+app.get('/task',async(request,response) =>{
+    console.log("sessionID: " + request.sessionID);
+    const dbProjects = await getFirestore('Projects','Better Firestore Project');
+    const dbUser = await getFirestore('Users','BarnesH');
+    const dbTasks = await getFirestore('Tasks','task1');
+    const dbComments = await getFirestore('Comments','comment1');
+    response.render('task',{dbProjects,dbUser,dbTasks,dbComments});
 });
+
+/** Create Task Functionality **/
+app.get('/createTask',async(request,response) =>{
+    console.log("sessionID: " + request.sessionID);
+    const dbProjects = await getFirestore('Projects','Better Firestore Project');
+    const dbUser = await getFirestore('Users','BarnesH');
+    response.render('createTask',{dbProjects,dbUser});
+});
+app.post('/createTask', (request, response) =>{
+    console.log("sessionID: " + request.sessionID);
+    let data = request.body;
+    // add the empty team array to the project
+    data["team"] = [];
+    // add the data to the database
+    //insertData("Projects", data.projectName, data);
+    response.redirect("/task");
+});
+
+/** The Single Project Summary view */
+app.get('/projectSummary',async(request,response) =>{
+    console.log("sessionID: " + request.sessionID);
+    const dbProjects = await getFirestore('Projects','Better Firestore Project');  //add reference for chosen project
+    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
+    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
+    response.render('projectSummary',{dbProjects,dbUser,dbTasks});
+});
+
+/** The Single Project Tracking view */
+app.get('/projectTracking',async(request,response) =>{
+    console.log("sessionID: " + request.sessionID);
+    const dbProjects = await getFirestore('Projects','Better Firestore Project'); //add reference for chosen project
+    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
+    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
+    response.render('projectTracking',{dbProjects,dbUser,dbTasks});
+});
+
+/** The Sign Up View*/
+app.get('/signUp', async(request,response) =>{
+    console.log("sessionID: " + request.sessionID);
+    response.render('signUp',{G_CID});
+})
+
+app.get('/logout', function(request,response) {
+    console.log("sessionID: " + request.sessionID);
+    request.session.destroy(function(e){
+        request.logout();
+        response.redirect('/');
+    });
+});
+
+
+
+
+/** Testing functions **/
+
+// Sitemap for testing - remove when published
+app.get('/siteMap',(request,response) =>{
+    console.log("sessionID: " + request.sessionID);
+    response.render('siteMap');
+}); // Sitemap for testing - remove when published
+
+//Delete below before deploying
+app.get('/sessionInfo', (request, response) => 
+    response.send(userProfile._json.email)
+    //response.send(userProfile.emails[0].value)
+);
+//Delete above before deploying
+
+
 exports.app = functions.https.onRequest(app);

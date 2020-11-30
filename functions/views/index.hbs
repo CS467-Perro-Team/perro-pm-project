@@ -7,6 +7,11 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    	<script src="https://apis.google.com/js/platform.js" async defer></script>
+    	<script>
+			    
+
+    	</script>
 		<style>
 			html, body{
 				height: 100%;
@@ -33,8 +38,7 @@
 		</style>
 		<meta name="robots" content="noindex nofollow">
 		<meta name="google-signin-scope" content="profile email">
-    	<meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
-    	<script src="https://apis.google.com/js/platform.js" async defer></script>
+    	<meta name="google-signin-client_id" content={{G_CID}}>
   	</head>
 
   	<!-- Begin Body -->
@@ -43,7 +47,7 @@
     	<div class="container mainView">
     		<div class="row empty-row mb-4">
     		</div>
-    		<!-- Begin login-container row-->
+    		<!-- Begin login-container row -->
     		<div class="row login-container mt-4">
     			<!-- Begin empty left col-->
 	    		<div class="col empty-col">
@@ -66,32 +70,22 @@
 							</div>
 						</div>
 						<div class="row mt-4 d-flex justify-content-center">
-							<div class="g-signin2" style="width:275" data-onsuccess="onSignIn" data-theme="light"></div>
+								<!--div class="g-signin2" style="width:275" data-onsuccess="onSignIn" data-theme="light"></div-->
+								<!--div id="firebaseui-auth-container"></div>
+								<div id="loader"></div-->
+							<div class="col-4">	
+							</div>
+							<div class="col-6 justify-content-center">
+        						<a href="/auth/google" style="width:275" data-theme="light"> Sign In with Google</a>
+							</div>
+							<div class="col">	
+							</div>
 						</div>
-						<!-- The surrounding HTML is left untouched by FirebaseUI.
-		     			Your app may use that space for branding, controls and other customizations.-->
-					    <script>
-					      function onSignIn(googleUser) {
-					        // Useful data for your client-side scripts:
-					        var profile = googleUser.getBasicProfile();
-					        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-					        console.log('Full Name: ' + profile.getName());
-					        console.log('Given Name: ' + profile.getGivenName());
-					        console.log('Family Name: ' + profile.getFamilyName());
-					        console.log("Image URL: " + profile.getImageUrl());
-					        console.log("Email: " + profile.getEmail());
-
-					        // The ID token you need to pass to your backend:
-					        var id_token = googleUser.getAuthResponse().id_token;
-					        console.log("ID Token: " + id_token);
-					      }
-					    </script>
-					    <!-- Begin internal-email-row -->
 						<div class="row internal-email-row mb-2 pt-4">
 							<div class="col-1">
 							</div>
 							<div class="col">
-								<p class="text-center" style="font-size:12">Don't have an account? <a href='/signUp'>Sign up</a></p>
+								<p class="text-center" style="font-size:12">Don't have an account? <a href="#">Sign up</button></p>
 							</div>
 						</div>
 						<!-- End internal email-row -->
@@ -135,7 +129,7 @@
 						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
 						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
 						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
-						<li class="nav-item"><a class="nav-link" href="#" onclick="signOut();">sign out</a></li>
+						<li class="nav-item"><a class="nav-link" href="/logout">sign out</a></li>
 					</ul>
 	    		</div>
 	    		<!-- End Middle column -->

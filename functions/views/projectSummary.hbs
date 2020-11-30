@@ -53,13 +53,13 @@
 					<div class="row pt-2">
 						<div class="col">
 							<span class="font-weight-bold">Username</span>
-							<span id="username">{{dbUser.login.username}}</span>
+							<span id="username">{{dbUser.username}}</span>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col">
 	    					<span class="font-weight-bold">Role</span>
-	    					<span id="userRoll">{{userRole}}</span>
+	    					<span id="userRoll">{{dbUser.userrole}}</span>
 	    				</div>
 	    			</div>	
 	    		</div>
@@ -124,7 +124,7 @@
 						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
 						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
 						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
-						<li class="nav-item"><a class="nav-link" href="#" onclick="signOut();">sign out</a></li>
+						<li class="nav-item"><a class="nav-link" href="/logout">sign out</a></li>
 					</ul>
 	    		</div>
 	    		<!-- End Middle column -->
