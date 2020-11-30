@@ -86,17 +86,27 @@ const project = [
 const task = [
     {
         taskName: 'Redesign Database Structure',
-        taskStartDate: admin.firestore.Timestamp.fromDate(new Date(date)),
+        taskStartDate: admin.firestore.Timestamp.fromDate(new Date('11/28/2020')),
         taskDueDate: admin.firestore.Timestamp.fromDate(new Date('11/30/2020')),
         taskAssignee: 'warnemun',
-        taskDescription: 'Create a better firestore database structure that meets current needs and allows for scalability in the future'
+        taskDescription: 'Create a better firestore database structure that meets current needs and allows for scalability in the future',
+        taskStatus: 'open'
     },
     {
         taskName: 'Recreate createdDB.js file',
-        taskStartDate: admin.firestore.Timestamp.fromDate(new Date(date)),
+        taskStartDate: admin.firestore.Timestamp.fromDate(new Date('11/28/2020')),
         taskDueDate: admin.firestore.Timestamp.fromDate(new Date('11/30/2020')),
         taskAssignee: 'warnemun',
-        taskDescription:'Redo the createDB file to match the restructured database'
+        taskDescription:'Redo the createDB file to match the restructured database',
+        taskStatus: 'open'
+    },    
+    {
+        taskName: 'Run createdDB.js file',
+        taskStartDate: admin.firestore.Timestamp.fromDate(new Date('11/28/2020')),
+        taskDueDate: admin.firestore.Timestamp.fromDate(new Date('11/30/2020')),
+        taskAssignee: 'warnemun',
+        taskDescription:'Redo the createDB file to match the restructured database',
+        taskStatus: 'open'
     }
 ]
 
@@ -107,7 +117,7 @@ const comment = [
         commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
     },
     {
-        commentUser: "lindorg",
+        commentUsername: "lindorg",
         commentText: "Let's just reprioritize other tasks",
         commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
     },
@@ -117,7 +127,7 @@ const comment = [
         commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
     },
     {
-        commentUser: "warnemun",
+        commentUsername: "warnemun",
         commentText: "Thanks for the update!",
         commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
     }
@@ -131,13 +141,21 @@ const teamMember = [
 		]
 	}
 ]
+
+const taskStatus = [
+	{
+		taskStatus: 'complete'
+	}
+]
+
 const myData = {
     user: user,
     project: project,
     comment: comment,
     task: task,
     userrole: userrole,
-    teamMember: teamMember
+    teamMember: teamMember,
+    taskStatus: taskStatus
 }
 /**
  *  Functions to add data to the database
@@ -159,23 +177,30 @@ const insertNewProject = async (projectName, projectData, projectIndex) => {
     	console.log(e);
     }
 }
-const insertNewProjectTeamMember = async (projectName, teamMember) => {
+const updateProjectTeamMember = async (projectName, teamMember) => {
 	try{
 		await firestoreDB.collection("Projects").doc(projectName).update(teamMember[0]);
 	} catch(e){
     	console.log(e);
 	}
 }
-const insertNewTask = async (projectName, TaskName, taskData, taskIndex) => {
+const insertNewTask = async (projectName, taskName, taskData, taskIndex) => {
     try{
-    	await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(TaskName).set(taskData[taskIndex]);
+    	await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(taskName).set(taskData[taskIndex]);
     }catch(e){
     	console.log(e);
     }
 }
-const insertNewComment = async (projectName, TaskName, commentData, commentIndex) => {
+const updateTaskStatus = async (projectName, taskName, taskStatus, taskIndex) => {
 	try{
-    	await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(TaskName).collection("Comments").doc().set(commentData[commentIndex]);
+		await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(taskName).update(taskStatus[taskIndex]);
+	} catch(e){
+    	console.log(e);
+	}
+}
+const insertNewComment = async (projectName, taskName, commentData, commentIndex) => {
+	try{
+    	await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(taskName).collection("Comments").doc().set(commentData[commentIndex]);
 	} catch(e){
 		console.log(e);
 	}
@@ -196,18 +221,24 @@ insertUserData(myData.user[3].useremail, myData.user, 3);
 // add new project to database (no tasks data, no comment data)
 insertNewProject(myData.project[0].projectName, myData.project, 0);
 
-// add new tasks to database (no comment data)
+// // add new tasks to database (no comment data)
 insertNewTask(myData.project[0].projectName, myData.task[0].taskName, myData.task, 0);
 insertNewTask(myData.project[0].projectName, myData.task[1].taskName, myData.task, 1);
+insertNewTask(myData.project[0].projectName, myData.task[2].taskName, myData.task, 2);
 
-// add new comments to database
+// // add new comments to database
 insertNewComment(myData.project[0].projectName, myData.task[0].taskName, myData.comment, 0);
 insertNewComment(myData.project[0].projectName, myData.task[0].taskName, myData.comment, 1);
-insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.comment, 0);
-insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.comment, 1);
+insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.comment, 2);
+insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.comment, 3);
 
 // add userroles to database
 for(i=0;i<userrole.length;i++){
 	insertUserRoles(myData.userrole[i].userrole, myData.userrole,i);
 }
-insertNewProjectTeamMember(myData.project[0].projectName, myData.teamMember);
+
+
+// After first run - comment out lines 215-237, uncomment below and rerun this file.
+// updateProjectTeamMember(myData.project[0].projectName, myData.teamMember);
+
+// updateTaskStatus(myData.project[0].projectName, myData.task[2].taskName, myData.taskStatus, 0);
