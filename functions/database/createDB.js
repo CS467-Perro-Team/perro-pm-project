@@ -2,67 +2,212 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const getMySecretKey = require('../secretKey');  // You need to make your own module
-const myData = require('./sampleData')
-
 
 // set up authentication with local environment
-
-const serviceAccount = require(getMySecretKey());
+const serviceAccount = require(getyMySecretKey());
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://perro-pm-project.firebaseio.com"
+  	credential: admin.credential.cert(serviceAccount),
+  	databaseURL: "https://perro-pm-project.firebaseio.com" 
 });
 
 const firestoreDB = admin.firestore();
 
+/**
+ * Sample Data for Firestore
+ *  The arrays are collections, and the objects are the documents
+ *  Dates are in timestamp format
+ */
+const userrole = [
+	{
+		userrole: 'project manager',
+		createProject: true,
+		createTask: true,
+		createComment: true
+	},
+	{
+		userrole: 'project participant',
+		createProject: false,
+		createTask: true,
+		createComment: true
+	},
+		{
+		userrole: 'project stakeholder',
+		createProject: false,
+		createTask: false,
+		createComment: true
+	}
+]
 
+const user = [
+    {
+        firstName: "Gerson",
+        lastName: "Lindor",
+        useremail: "lindorg@oregonstate.edu",
+        username: "lingorg",
+        userrole: "project manager"
+    },
+    {
+        firstName: "Nicole",
+        lastName: "Warnemuende",
+        useremail: "warnemun@oregonstate.edu",
+        username: "warnemun",
+        userrole: "project manager"
+    },
+    {
+        firstName: "Gerson",
+        lastName: "Lindor",
+        useremail: "gerson.0317@gmail.com",
+        username: "gerson.0317",
+        userrole: "project participant"
+    },
+    {
+        firstName: "Nicole",
+        lastName: "Warnemuende",
+        useremail: "warnemun@oregonstate.edu",
+        username: "warnemun",
+        userrole: "project particpant"
+    }
+]
+
+var projectDueDate = new Date('2020-12-04').getTime();
+var date = new Date();
+
+const project = [
+    {
+        projectName: "The final days project",
+        projectDueDate: admin.firestore.Timestamp.fromDate(new Date(projectDueDate)),
+        projectDescription: "The items that need to be completed in the final week of the Perro Project.",
+        projectStartDate: admin.firestore.Timestamp.fromDate(new Date(date)),
+        projectTeam: [],
+    }
+]
+
+const task = [
+    {
+        taskName: 'Redesign Database Structure',
+        taskStartDate: admin.firestore.Timestamp.fromDate(new Date(date)),
+        taskDueDate: admin.firestore.Timestamp.fromDate(new Date('11/30/2020')),
+        taskAssignee: 'warnemun',
+        taskDescription: 'Create a better firestore database structure that meets current needs and allows for scalability in the future'
+    },
+    {
+        taskName: 'Recreate createdDB.js file',
+        taskStartDate: admin.firestore.Timestamp.fromDate(new Date(date)),
+        taskDueDate: admin.firestore.Timestamp.fromDate(new Date('11/30/2020')),
+        taskAssignee: 'warnemun',
+        taskDescription:'Redo the createDB file to match the restructured database'
+    }
+]
+
+const comment = [
+    {
+        commentUsername: "warnemun",
+        commentText: "This task is behind schedule",
+        commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
+    },
+    {
+        commentUser: "lindorg",
+        commentText: "Let's just reprioritize other tasks",
+        commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
+    },
+    {
+        commentUsername: "lindorg",
+        commentText: "Still working on this, and making good progress.",
+        commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
+    },
+    {
+        commentUser: "warnemun",
+        commentText: "Thanks for the update!",
+        commentDate: admin.firestore.Timestamp.fromDate(new Date(date))
+    }
+
+]
+const teamMember = [
+	{
+		projectTeam: [
+			'warnemun',
+			'lindorg'
+		]
+	}
+]
+const myData = {
+    user: user,
+    project: project,
+    comment: comment,
+    task: task,
+    userrole: userrole,
+    teamMember: teamMember
+}
 /**
  *  Functions to add data to the database
  */
-const insertData = async (collectionName, docName, objCollect, index) => {
-    if (docName === null) {
-        await firestoreDB.collection(collectionName).doc().set(objCollect[index]);
-    } else {
-        await firestoreDB.collection(collectionName).doc(docName).set(objCollect[index]);
+ // Insert data for projects with nested collections
+const insertUserData = async (userEmail, userData, userIndex) => {
+    try{
+		await firestoreDB.collection("Users").doc(userEmail).set(userData[userIndex]);
+    }catch(e){
+    	console.log(e);
     }
 }
 
-const insertNestedData = async (parentCollection, parentDocID, collectionName, docName, data) => {
-    await firestoreDB.collection(parentCollection).doc(parentDocID).collection(collectionName).doc(docName).set(data);
+// Insert data for projects
+const insertNewProject = async (projectName, projectData, projectIndex) => {
+    try{
+		await firestoreDB.collection("Projects").doc(projectName).set(projectData[projectIndex]);
+    }catch(e){
+    	console.log(e);
+    }
 }
-
-// add collaborators to database
-insertData("Collaborators", null, myData.data.collaborator, 0);
-
-// add comments to database
-insertData("Comments", null, myData.data.comment, 0);
-insertData("Comments", null, myData.data.comment, 1);
-
+const insertNewProjectTeamMember = async (projectName, teamMember) => {
+	try{
+		await firestoreDB.collection("Projects").doc(projectName).update(teamMember[0]);
+	} catch(e){
+    	console.log(e);
+	}
+}
+const insertNewTask = async (projectName, TaskName, taskData, taskIndex) => {
+    try{
+    	await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(TaskName).set(taskData[taskIndex]);
+    }catch(e){
+    	console.log(e);
+    }
+}
+const insertNewComment = async (projectName, TaskName, commentData, commentIndex) => {
+	try{
+    	await firestoreDB.collection("Projects").doc(projectName).collection("Tasks").doc(TaskName).collection("Comments").doc().set(commentData[commentIndex]);
+	} catch(e){
+		console.log(e);
+	}
+}
+const insertUserRoles = async (userRole, userData, userIndex) => {
+	try{
+    	await firestoreDB.collection("UserRoles").doc(userRole).set(userData[userIndex]);
+	} catch(e){
+		console.log(e);
+	}
+}
 // add users to database
-insertData("Users", myData.data.user[0].login.username, myData.data.user, 0);
-insertData("Users", myData.data.user[1].login.username, myData.data.user, 1);
-insertData("Users", myData.data.user[2].login.username, myData.data.user, 2);
-insertData("Users", myData.data.user[3].login.username, myData.data.user, 3);
+insertUserData(myData.user[0].useremail, myData.user, 0);
+insertUserData(myData.user[1].useremail, myData.user, 1);
+insertUserData(myData.user[2].useremail, myData.user, 2);
+insertUserData(myData.user[3].useremail, myData.user, 3);
 
-// add projects to database
-insertData("Projects", myData.data.project[0].projectName, myData.data.project, 0);
-insertData("Projects", myData.data.project[1].projectName, myData.data.project, 1);
-insertData("Projects", myData.data.project[2].projectName, myData.data.project, 2);
-insertData("Projects", myData.data.project[3].projectName, myData.data.project, 3);
+// add new project to database (no tasks data, no comment data)
+insertNewProject(myData.project[0].projectName, myData.project, 0);
 
-// add tasks for  project 1
-insertNestedData("Projects", myData.data.project[0].projectName, "Tasks", myData.data.Task[0][0].taskName, myData.data.Task[0][0]);
-insertNestedData("Projects", myData.data.project[0].projectName, "Tasks", myData.data.Task[0][1].taskName, myData.data.Task[0][1]);
-insertNestedData("Projects", myData.data.project[0].projectName, "Tasks", myData.data.Task[0][2].taskName, myData.data.Task[0][2]);
+// add new tasks to database (no comment data)
+insertNewTask(myData.project[0].projectName, myData.task[0].taskName, myData.task, 0);
+insertNewTask(myData.project[0].projectName, myData.task[1].taskName, myData.task, 1);
 
-// add tasks for project 2
-insertNestedData("Projects", myData.data.project[1].projectName, "Tasks", myData.data.Task[1][0].taskName, myData.data.Task[1][0]);
-insertNestedData("Projects", myData.data.project[1].projectName, "Tasks", myData.data.Task[1][1].taskName, myData.data.Task[1][1]);
-insertNestedData("Projects", myData.data.project[1].projectName, "Tasks", myData.data.Task[1][2].taskName, myData.data.Task[1][2]);
+// add new comments to database
+insertNewComment(myData.project[0].projectName, myData.task[0].taskName, myData.comment, 0);
+insertNewComment(myData.project[0].projectName, myData.task[0].taskName, myData.comment, 1);
+insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.comment, 0);
+insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.comment, 1);
 
-// add tasks for project 3
-insertNestedData("Projects", myData.data.project[2].projectName, "Tasks", myData.data.Task[2][0].taskName, myData.data.Task[2][0]);
-
-// add tasks for project 4
-insertNestedData("Projects", myData.data.project[3].projectName, "Tasks", myData.data.Task[3][0].taskName, myData.data.Task[3][0]);
+// add userroles to database
+for(i=0;i<userrole.length;i++){
+	insertUserRoles(myData.userrole[i].userrole, myData.userrole,i);
+}
+insertNewProjectTeamMember(myData.project[0].projectName, myData.teamMember);
