@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const getMySecretKey = require('../secretKey');  // You need to make your own module
 
 // set up authentication with local environment
-const serviceAccount = require(getyMySecretKey());
+const serviceAccount = require(getMySecretKey());
 
 admin.initializeApp({
   	credential: admin.credential.cert(serviceAccount),
@@ -43,7 +43,7 @@ const user = [
         firstName: "Gerson",
         lastName: "Lindor",
         useremail: "lindorg@oregonstate.edu",
-        username: "lingorg",
+        username: "lindorg",
         userrole: "project manager"
     },
     {
