@@ -212,6 +212,7 @@ const insertUserRoles = async (userRole, userData, userIndex) => {
 		console.log(e);
 	}
 }
+/*
 // add users to database
 insertUserData(myData.user[0].useremail, myData.user, 0);
 insertUserData(myData.user[1].useremail, myData.user, 1);
@@ -236,8 +237,9 @@ insertNewComment(myData.project[0].projectName, myData.task[1].taskName, myData.
 for(i=0;i<userrole.length;i++){
 	insertUserRoles(myData.userrole[i].userrole, myData.userrole,i);
 }
+*/
 
 // After first run - comment out lines 216-238, uncomment below and rerun this file.
-// updateProjectTeamMember(myData.project[0].projectName, myData.teamMember);
+updateProjectTeamMember(myData.project[0].projectName, myData.teamMember);
 
-// updateTaskStatus(myData.project[0].projectName, myData.task[2].taskName, myData.taskStatus, 0);
+updateTaskStatus(myData.project[0].projectName, myData.task[2].taskName, myData.taskStatus, 0);
