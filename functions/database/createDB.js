@@ -12,7 +12,6 @@ admin.initializeApp({
 });
 
 const firestoreDB = admin.firestore();
-
 /**
  * Sample Data for Firestore
  *  The arrays are collections, and the objects are the documents
@@ -79,6 +78,7 @@ const project = [
         projectDueDate: admin.firestore.Timestamp.fromDate(new Date(projectDueDate)),
         projectDescription: "The items that need to be completed in the final week of the Perro Project.",
         projectStartDate: admin.firestore.Timestamp.fromDate(new Date(date)),
+        projectManager: 'warnemun',
         projectTeam: [],
     }
 ]
@@ -237,8 +237,7 @@ for(i=0;i<userrole.length;i++){
 	insertUserRoles(myData.userrole[i].userrole, myData.userrole,i);
 }
 
-
-// After first run - comment out lines 215-237, uncomment below and rerun this file.
+// After first run - comment out lines 216-238, uncomment below and rerun this file.
 // updateProjectTeamMember(myData.project[0].projectName, myData.teamMember);
 
 // updateTaskStatus(myData.project[0].projectName, myData.task[2].taskName, myData.taskStatus, 0);
