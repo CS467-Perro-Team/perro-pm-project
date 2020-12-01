@@ -79,16 +79,17 @@
   					</div>
 					<div class="col">
 						<form action="/createTask" method="POST">
+							<input type="hidden" id="hiddenProjectName" name="projectName" value='{{dbProjects.projectName}}'>
 							<div class="row form-group">
 								<label id="taskNameInputLabel" for="taskNameInput">Task Name</label>
 								<div class="col pr-0">
-									<input type="text" class="form-control border border-dark" id="taskNameInput"  placeholder="Enter New Unique Task Name" name="taskName">
+									<input type="text" class="form-control border border-dark" id="taskName"  placeholder="Enter New Unique Task Name" name="taskName">
 								</div>
 							</div>
 				
 							<div class="row form-group">
 								<label class="pr-4 mr-1" for="taskDueDate">Due date</label>
-								<input type="date" class="datepicker pl-2" data-date-format="mm/dd/yyy" id="taskDueDate" name="dueDate">
+								<input type="date" class="datepicker pl-2" data-date-format="mm/dd/yyy" id="taskDueDate" name="taskDueDate">
 							</div>
 				
 							<div class="row form-group">
@@ -114,7 +115,7 @@
 								</div>
 
 								<div class="col pr-0">		
-									<button type="submit" class="btn btn-primary float-right"><a href="/task">Create Task</a></button>
+									<button type="submit" class="btn btn-primary float-right">Create Task</button>
 								</div>
 
 							</div>

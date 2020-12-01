@@ -7,9 +7,9 @@ const admin = require('firebase-admin');
 //admin.initializeApp(functions.config().firebase);
 /*Replacement code for deploying to firebase hosted site*/
 
-//Replace this code block with replacement code above
+/*Replace this code block with replacement code above*/
 // set up authentication with local environment
-const getMySecretKey = require('./secretKey');  // You need to make your own module
+//const getMySecretKey = require('./secretKey');  // You need to make your own module
 const serviceAccount = require(getMySecretKey());
 
 admin.initializeApp({
@@ -40,7 +40,6 @@ app.set('views', './views');
 //Views will be hbs files
 app.set('view engine', 'hbs');
 
-
 // Config
 const CONFIG = require('./config.js');
 const G_CID = CONFIG.client_id;
@@ -54,13 +53,13 @@ const client = new OAuth2Client(G_CID);
 // Session Setup
 var sessionStuff = {
     secret: SECRET,
-    resave: true,
+    resave: false,
+    saveUninitialized: false,
     cookie:{
         //7 days
         maxAge: 24*60*60*7*1000
     }
 }
-//console.log(sessionStuff);
 
 app.set('trust proxy',1);
 app.use(session(sessionStuff));
@@ -79,9 +78,6 @@ app.get('/', (request, response) => {
     response.render('index', {G_CID});
 });
 
-//const port = process.env.PORT || 3000;
-//app.listen(port , () => console.log('App listening on port ' + port));
-
 // Passport Setup
 const passport = require('passport');
 var userProfile;
@@ -91,8 +87,8 @@ app.use(passport.session());
 
 
 app.get('/success', (request, response) => 
-    //response.send(userProfile)
-    response.redirect("projectList")
+    response.send(userProfile)        //This is helpful to see what's avail from google profile object
+    // response.redirect("projectList")
 );
 app.get('/error', (request, response) => 
     response.render("error", "error logging in")
@@ -111,7 +107,8 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 passport.use(new GoogleStrategy({
     clientID: G_CID,
     clientSecret: G_CSEC,
-    callbackURL: "http://localhost:5000/auth/google/callback"
+    callbackURL: "http://localhost:5000/auth/google/callback"  // local environment
+    // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
   },
   function(accessToken, refreshToken, profile, done) {
       userProfile=profile;
@@ -123,50 +120,102 @@ app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'e
  
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
     // Successful authentication, redirect success.
-    response.redirect("/projectList");
+    response.redirect("/projectList"); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
 
-
-/**  Query functions  **/
-/**
- *  Functions to add data to the database
+/*
+ *  Functions to add/update database
  */
-const insertData = async (collectionName, docName, data) => {
-    if (docName === null) {
-        await firestoreCon.collection(collectionName).doc().set(data);
-    } else {
-        await firestoreCon.collection(collectionName).doc(docName).set(data);
+
+// Create New Project
+const createNewProject = async (projectName, projectData) => {
+    try{
+        await firestoreCon.collection("Projects").doc(projectName).set(projectData);
+    }catch(e){
+        console.log(e);
     }
 }
-const giveAListOfDocuments = (collection) => {
-    const listOfDocs = [];
-    collection.forEach( doc => {
-        listOfDocs.push(doc.data());
-    })
-    return listOfDocs;
+// Create New Task
+const createNewTask = async(projectName, taskName, taskData) => {
+    try{
+        await firestoreCon.collection("Projects").doc(projectName).collection("Tasks").doc(taskName).set(taskData);
+    } catch(e){
+        console.log(e);
+    }
 }
+
 /*
-@desc Retrieves data from the database by requesting the collection and the document
-@param  collectionName - The name of a collection in Firestore DB
-        docName - The name of the document in the collection
-@return object - contains the document data
+*  Functions to retrieve data from database
 */
-async function getFirestore(collectionName, docName) {
-    const result = firestoreCon.collection(collectionName).doc(docName).get().then(doc =>{
+async function getUserInfo(user,loginAttempt) {
+    const result = firestoreCon.collection("Users").doc(user).get().then(doc =>{
+        if (!doc.exists){
+            if(loginAttempt) {
+                return true; // user that doesn't exist attempting to login
+            } else{
+                console.log('No such user!');
+                return;
+            }
+        } else {
+            return doc.data();
+        }
+    }).catch( err => {
+        console.log('Error getting user', err);
+            return;
+    });
+    return result;
+}
+// Get all Project Manager usernames - NOT YET WORKING --
+/*async function getProjectManagers(){
+    const userRef = firestoreCon.collection("Users");
+    const pmRefs = await userRef.where('userrole', '==', 'project manager').get();
+    const listOfPMs = [];
+    pmRefs.forEach( doc => {
+        listOfPMs.push(doc.data().username);
+    });
+    return listOfPMs;
+}*/
+// Get all userNames -- NOT YET WORKING -- 
+/*async function getUserNames(){
+    const userRefs = firestoreCon.collection("Users");
+    const listOfUsernames = [];
+    userRefs.forEach( doc => {
+        listOfUsernames.push(doc.data().username);
+    });
+    return listOfUsernames;
+}*/
+// Get Projects Info (Field values for a specific project)
+async function getProjectInfo(projectName) {
+    const result = firestoreCon.collection("Projects").doc(projectName).get().then(doc =>{
         if (!doc.exists) {
-            console.log('No such document!');
+            console.log('No such project!');
             return;
         } else {
             return doc.data();
             
         }
     }).catch( err => {
-        console.log('Error getting document', err);
+        console.log('Error getting project', err);
             return;
     });
     return result
 }
-
+// Get Task Info (Field values for a specific task)
+async function getTaskInfo(projectName, taskName) {
+    const result = firestoreCon.collection("Projects").doc(projectName).collection("Tasks").doc(taskName).get().then(doc =>{
+        if (!doc.exists) {
+            console.log('No such task!');
+            return;
+        } else {
+            return doc.data();
+        }
+    }).catch( err => {
+        console.log('Error getting task', err);
+            return;
+    });
+    return result
+}
+// Helper function to return list of documents for a specific collection
 async function getCollection(collectionName) {
     const collectRef = firestoreCon.collection(collectionName);
     const docList = await collectRef.get();
@@ -176,7 +225,7 @@ async function getCollection(collectionName) {
     })
     return listOfDocs;
 }
-
+// Helper function to return list of tasks for a specific project
 async function getTaskListFromAProject(projectName) {
     const projectsRef = firestoreCon.collection('Projects');
     const tasks = await projectsRef.where('projectName','==', projectName).get()
@@ -186,11 +235,11 @@ async function getTaskListFromAProject(projectName) {
     })
     // get the tasks collection
     const taskCollection = await projectsRef.doc(projID).collection('Tasks').get();
-    const taskList = giveAListOfDocuments(taskCollection);
+    const taskList = getDocumentList(taskCollection);
     return taskList;
 }
 
-// create an object for the table in project list view
+// Helper function to create an object for the table in project list view
 const createObjectForProjectListView = (projName, taskList) => {
         let totalTasks = taskList.length;
         // get completed tasks count
@@ -217,23 +266,54 @@ const createObjectForProjectListView = (projName, taskList) => {
         }
         return projectListView;
 }
+// Helper function to create list of docs for a sub collection
+const getDocumentList = (collection) => {
+    const listOfDocs = [];
+    collection.forEach( doc => {
+        listOfDocs.push(doc.data());
+    })
+    return listOfDocs;
+}
 
 /** Routes */
 /** The Project List view **/
 app.get('/projectList',async(request,response) => {
-    console.log("sessionID: " + request.sessionID);
-    var useremail = userProfile._json.email;
-    console.log(useremail);
-    const dbUser = await getFirestore('Users',useremail);
+    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
-    let projectRows = {};
-    const projectTable = [];
-    const taskList = [];
-    for (const project of projectList) {
+
+    var projectRows = {};
+    var projectTable = [];
+    var taskList = [];
+    
+    for (project of projectList) {
         taskList.push(getTaskListFromAProject(project.projectName));
     }
+    
     const taskCollection = await Promise.all(taskList);
-    for (let i = 0; i < projectList.length; ++i) {
+    
+    for (var i = 0; i < projectList.length; ++i) {
+        projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
+        projectTable.push(projectRows);
+    }
+    response.render('projectList',{dbUser,projectTable});
+});
+app.get('/projectList/:useremail',async(request,response) => {
+    const user = request.params.useremail;
+    const dbUser = await getUserInfo(user);
+    const projectList = await getCollection('Projects');
+
+    var projectRows = {};
+    var projectTable = [];
+    var taskList = [];
+    
+    for (project of projectList) {
+        taskList.push(getTaskListFromAProject(project.projectName));
+    }
+    
+    const taskCollection = await Promise.all(taskList);
+    
+    for (var i = 0; i < projectList.length; ++i) {
         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
         projectTable.push(projectRows);
     }
@@ -242,64 +322,82 @@ app.get('/projectList',async(request,response) => {
 
 /** The Create Project View **/
 app.get('/createProject',async(request,response) => {
-    console.log("sessionID: " + request.sessionID);
-    const dbUser = await getFirestore('Users','BarnesH');
+    const user = "warnemun@oregonstate.edu"; //
+    const dbUser = await getUserInfo(user);
+    /* Add Functionality for getting all project managers and all users*/
+        // const dbPMs = await getProjectManagers('Users');
+        // const dbUsers = await getAllUsers('Users');
+        // response.render('createProject',{dbUser, dbPMs, dbUsers});
     response.render('createProject',{dbUser});
 });
 
 /** Create Project Functionality **/
 app.post('/createProject', (request, response) => {
-    console.log("sessionID: " + request.sessionID);
-    let data = request.body;
-    // add the empty team array to the project
-    data["team"] = [];
-    // add the data to the database
-    insertData("Projects", data.projectName, data);
-    response.redirect("/projectList");
+    const data = request.body;
+    data.projectStartDate = new Date(data.projectStartDate);
+    data.projectDueDate = new Date(data.projectDueDate);
+    
+    // Add new project to database
+    createNewProject(data.projectName, data);
+    response.redirect("/projectSummary/" + data.projectName);
 });
 
-/** Create Task View **/
-app.get('/task',async(request,response) =>{
-    console.log("sessionID: " + request.sessionID);
-    const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','BarnesH');
-    const dbTasks = await getFirestore('Tasks','task1');
-    const dbComments = await getFirestore('Comments','comment1');
-    response.render('task',{dbProjects,dbUser,dbTasks,dbComments});
+/** Task View **/
+app.get('/task/:projectName/:taskName',async(request,response) =>{
+    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const projectName = request.params.projectName;
+    var taskName = request.params.taskName;
+
+    const dbProjects = await getProjectInfo(projectName);
+    const dbUser = await getUserInfo(user);
+    const dbTasks = await getTaskInfo(projectName,taskName);
+    //const dbComments = await getTaskComments(projectName, taskName);
+    response.render('task',{dbProjects,dbUser,dbTasks});
 });
 
 /** Create Task Functionality **/
-app.get('/createTask',async(request,response) =>{
-    console.log("sessionID: " + request.sessionID);
-    const dbProjects = await getFirestore('Projects','Better Firestore Project');
-    const dbUser = await getFirestore('Users','BarnesH');
+app.get('/createTask/:projectName',async(request,response) =>{
+    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const projectName = request.params.projectName;
+
+    const dbProjects = await getProjectInfo(projectName);
+    const dbUser = await getUserInfo(user);
     response.render('createTask',{dbProjects,dbUser});
 });
 app.post('/createTask', (request, response) =>{
-    console.log("sessionID: " + request.sessionID);
-    let data = request.body;
-    // add the empty team array to the project
-    data["team"] = [];
+    const data = request.body;
+    const taskName = data.taskName;
+    const projectName = data.projectName;
+
+    data.taskStartDate = new Date();
+    data.taskDueDate = new Date(data.taskDueDate);
+    data.taskStatus = "open";
+
     // add the data to the database
-    //insertData("Projects", data.projectName, data);
-    response.redirect("/task");
+    createNewTask(projectName,taskName, data);
+    response.redirect("/task/" + projectName + "/" + taskName);
 });
 
 /** The Single Project Summary view */
-app.get('/projectSummary',async(request,response) =>{
-    console.log("sessionID: " + request.sessionID);
-    const dbProjects = await getFirestore('Projects','Better Firestore Project');  //add reference for chosen project
-    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
-    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
+app.get('/projectSummary/:projectName',async(request,response) =>{
+    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const projectName = request.params.projectName;
+
+    const dbProjects = await getProjectInfo(projectName);
+    const dbUser = await getUserInfo(user);
+    const dbTasks = await getTaskListFromAProject(projectName);
+
     response.render('projectSummary',{dbProjects,dbUser,dbTasks});
 });
 
 /** The Single Project Tracking view */
-app.get('/projectTracking',async(request,response) =>{
-    console.log("sessionID: " + request.sessionID);
-    const dbProjects = await getFirestore('Projects','Better Firestore Project'); //add reference for chosen project
-    const dbUser = await getFirestore('Users','BarnesH'); // add variable to pull in user logged in
-    const dbTasks = await getTaskListFromAProject(dbProjects.projectName); // should return all tasks for this project
+app.get('/projectTracking/:projectName',async(request,response) =>{
+    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const projectName = request.params.projectName;
+    
+    const dbProjects = await getProjectInfo(projectName);
+    const dbUser = await getUserInfo(user); 
+    const dbTasks = await getTaskListFromAProject(projectName);
     response.render('projectTracking',{dbProjects,dbUser,dbTasks});
 });
 
