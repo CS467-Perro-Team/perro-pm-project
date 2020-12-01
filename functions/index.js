@@ -9,7 +9,7 @@ const admin = require('firebase-admin');
 
 /*Replace this code block with replacement code above*/
 // set up authentication with local environment
-//const getMySecretKey = require('./secretKey');  // You need to make your own module
+const getMySecretKey = require('./secretKey');  // You need to make your own module
 const serviceAccount = require(getMySecretKey());
 
 admin.initializeApp({
@@ -80,15 +80,24 @@ app.get('/', (request, response) => {
 
 // Passport Setup
 const passport = require('passport');
-/// var userProfile;   global var
+
+
+/** Middleware to verify that the user is still logged in */
+const isLoggedIn = (req, res, next) => {
+    //console.log("THIS IS REQ\n", req);
+    if (req.user) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+}
+
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.get('/success', (request, response) => 
-    response.send(userProfile)        //This is helpful to see what's avail from google profile object
-    // response.redirect("projectList")
+    response.redirect("projectList")
 );
 app.get('/error', (request, response) => 
     response.render("error", "error logging in")
@@ -107,7 +116,7 @@ passport.deserializeUser(function(user, cb) {
 /**
  *  Functions to add data to the database
  */
-const insertData = async (collectionName, docName, data) => {
+const insertUserData = async (collectionName, docName, data) => {
     if (docName === null) {
         await firestoreCon.collection(collectionName).doc().set(data);
     } else {
@@ -125,11 +134,11 @@ passport.use(new GoogleStrategy({
     // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
   },
   function(accessToken, refreshToken, profile, done) {
-      //const userProfile=profile;
       const { emails, name } = profile;
       let emailFromProfile = emails[0].value;
       // verify that the user is in the DB by getting the user
-      let aUser = getFirestore("Users", emailFromProfile);
+      // let aUser = getFirestore("Users", emailFromProfile);
+      let aUser = getUserInfo(emailFromProfile);
       if (!aUser.username) {
           // create the new user 
           let userName = emailFromProfile.split('@')[0];
@@ -142,21 +151,13 @@ passport.use(new GoogleStrategy({
               userrole: userRole 
           }
           // insert the new user to the DB
-          insertData("Users", aUser.useremail, aUser);
+          insertUserData("Users", aUser.useremail, aUser);
       }
       return done(null, aUser);
   }
 ));
 
 
-/** Middleware to verify that the user is still logged in */
-const isLoggedIn = (req, res, next) => {
-    if (req.user) {
-        next();
-    } else {
-        res.sendStatus(401);
-    }
-}
  
 
 app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
@@ -165,6 +166,8 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     // Successful authentication, redirect success.
     response.redirect("/projectList"); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
+
+
 
 /*
  *  Functions to add/update database
@@ -190,7 +193,7 @@ const createNewTask = async(projectName, taskName, taskData) => {
 /*
 *  Functions to retrieve data from database
 */
-async function getUserInfo(user,loginAttempt) {
+async function getUserInfo(user) {
     const result = firestoreCon.collection("Users").doc(user).get().then(doc =>{
         if (!doc.exists){
             if(loginAttempt) {
@@ -320,7 +323,7 @@ const getDocumentList = (collection) => {
 
 /** Routes */
 /** The Project List view **/
-app.get('/projectList',async(request,response) => {
+app.get('/projectList', async(request,response) => {
     const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
@@ -341,7 +344,7 @@ app.get('/projectList',async(request,response) => {
     }
     response.render('projectList',{dbUser,projectTable});
 });
-app.get('/projectList/:useremail',async(request,response) => {
+app.get('/projectList/:useremail', async(request,response) => {
     const user = request.params.useremail;
     const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
@@ -364,7 +367,7 @@ app.get('/projectList/:useremail',async(request,response) => {
 });
 
 /** The Create Project View **/
-app.get('/createProject',async(request,response) => {
+app.get('/createProject', async(request,response) => {
     const user = "warnemun@oregonstate.edu"; //
     const dbUser = await getUserInfo(user);
     /* Add Functionality for getting all project managers and all users*/
@@ -386,7 +389,7 @@ app.post('/createProject', (request, response) => {
 });
 
 /** Task View **/
-app.get('/task/:projectName/:taskName',async(request,response) =>{
+app.get('/task/:projectName/:taskName', async(request,response) =>{
     const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const projectName = request.params.projectName;
     var taskName = request.params.taskName;
@@ -399,7 +402,7 @@ app.get('/task/:projectName/:taskName',async(request,response) =>{
 });
 
 /** Create Task Functionality **/
-app.get('/createTask/:projectName',async(request,response) =>{
+app.get('/createTask/:projectName', async(request,response) =>{
     const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const projectName = request.params.projectName;
 
@@ -422,7 +425,7 @@ app.post('/createTask', (request, response) =>{
 });
 
 /** The Single Project Summary view */
-app.get('/projectSummary/:projectName',async(request,response) =>{
+app.get('/projectSummary/:projectName', async(request,response) =>{
     const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const projectName = request.params.projectName;
 
@@ -434,7 +437,7 @@ app.get('/projectSummary/:projectName',async(request,response) =>{
 });
 
 /** The Single Project Tracking view */
-app.get('/projectTracking/:projectName',async(request,response) =>{
+app.get('/projectTracking/:projectName', async(request,response) =>{
     const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const projectName = request.params.projectName;
     
@@ -467,15 +470,5 @@ app.get('/siteMap',(request,response) =>{
     console.log("sessionID: " + request.sessionID);
     response.render('siteMap');
 }); // Sitemap for testing - remove when published
-
-/*
-//Delete below before deploying
-app.get('/sessionInfo', (request, response) => 
-    //response.send(userProfile._json.email) from global var
-    //response.send(userProfile.emails[0].value)
-);
-*/
-//Delete above before deploying
-
 
 exports.app = functions.https.onRequest(app);
