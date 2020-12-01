@@ -101,13 +101,13 @@
 	    			</div>	
 	    		</div>
 				<div class="col-4 pt-4">
-      				<button id="projectSummaryButton" class="button pr-1"><a href="/projectSummary">Summary</a></button>
+      				<button id="projectSummaryButton" class="button pr-1"><a href="/projectSummary/{{dbProjects.projectName}}">Summary</a></button>
       				<button id="projectTrackingButton" class="button pl-1" style="background:#417DB5; color:black !important"><a href="/projectTracking">Tracking</a></button>
 				</div>
 				<div class="col-1 empty-container">
 				</div>
 				<div class="col-2 pt-4">
-	  				<button id="createNewTask" class="float-right"><a href="/createTask">Create New Task</a></button>
+	  				<button id="createNewTask" class="float-right"><a href="/createTask/{{dbProjects.projectName}}">Create New Task</a></button>
   				</div>
 			</div>
 		</div>
@@ -125,7 +125,7 @@
 			    },
 			    xAxis: {
 			        accessibility: {
-			            rangeDescription: 'Range: {{dbProjects.startDate}} to {{dbProjects.dueDate}}'
+			            rangeDescription: 'Range: {{dbProjects.projectStartDate}} to {{dbProjects.projectDueDate}}'
 			        }
 			    },
 			    legend: {
@@ -138,7 +138,7 @@
 			            label: {
 			                connectorAllowed: false
 			            },
-			            pointStart: {{dbProjects.startDate}}
+			            pointStart: {{dbProjects.projectStartDate}}
 			        }
 			    },
 			    series: [{
@@ -186,7 +186,7 @@
 	      			<figure class="highcharts-figure">
 				    <div id="highchart-container"></div>
 				    <p class="highcharts-description">
-				        Basic line chart showing the progress of the project. Start date: {{dbProjects.startDate}} to {{dbProjects.dueDate}}
+				        Basic line chart showing the progress of the project. Start date: {{dbProjects.projectStartDate}} to {{dbProjects.projectDueDate}}
 				    </p>
 				</figure>
 

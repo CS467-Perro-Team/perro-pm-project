@@ -73,32 +73,32 @@
       	<!--Begin Main View Container-->
       	<div class="mainView container pt-2">
       		<!--Begin Add Project Details Container-->
-			<div class="container pt-4">
+			<div class="container pt-4 pb-4">
   				<div class="row">
   					<div class="col-3 empty-container">
   					</div>
-  					<div class="col">
+  					<div class="col border border-dark" style="background: #F1F3F4">
 						<form action="/createProject" method="POST">
-							<div class="row form-group">
+							<div class="row form-group pl-2 pr-2 pt-4">
 								<label id="projectNameInputLabel" for="projectNameInput">Project Name</label>
 								<div class="col pr-0">
 									<input type="text" class="form-control border border-dark" id="projectNameInput"  placeholder="Enter New Unique Project Name" name="projectName">
 								</div>
 							</div>
-							<div class="row form-group">
+							<div class="row form-group pl-2 pr-2">
 								<div class="col pl-0">
 									<label id="projectStartDateLabel" class="pr-1" for="projectStartDate">Start date</label>
-									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="startDate">
+									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="projectStartDate">
 								</div>
 								<div>
-									<label id="projectStartDateLabel" class="pl-1 pr-1" for="projectStartDate">Due date</label>
-									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectStartDate" name="dueDate">
+									<label id="projectDueDateLabel" class="pl-1 pr-1" for="projectDueDate">Due date</label>
+									<input type="date" class="datepicker" data-date-format="mm/dd/yyy" id="projectDueDate" name="projectDueDate">
 								</div>
 							</div>
-							<div class="row form-group">
-									<label id="projectAssigneeLabel" for="projectAssignee">Assigned To</label>
+							<div class="row form-group pl-2 pr-2">
+									<label id="projectManagerLabel" for="projectManager">Assigned To</label>
 								<div class="col-6 pr-0">
-								  	<select class="form-control border border-dark" id="projectAssignee" name="projectManager">
+								  	<select class="form-control border border-dark" id="projectManager" name="projectManager">
 										<!--{{#each projectManagers}}
 								  		<option>{{username}}</option>
 								  		{{/each}}-->
@@ -111,14 +111,14 @@
 								  	</select>
 								</div>
 							</div>
-							<div class="row form-group">
-								<label class="projectDescriptionInputLabel" for="projectDescriptionInput">Project Description</label>
-								<textarea class="form-control border border-dark" id="projectDescriptionInput"  placeholder="Brief Project Description" name="projectDescription"></textarea>
+							<div class="row form-group pl-2 pr-2">
+								<label class="projectDescriptionLabel" for="projectDescription">Project Description</label>
+								<textarea class="form-control border border-dark" id="projectDescription"  placeholder="Brief Project Description" name="projectDescription"></textarea>
 							</div>
-							<div class="row">
+							<div class="row pl-2 pr-2">
 								<div class="form-group">
-									<label for="addFollowers">Add Participants</label>
-								  	<select multiple class="col form-control border border-dark" id="addFollowers">
+									<label id="projectTeamLabel" for="projectTeam">Add Participants</label>
+								  	<select multiple class="col form-control border border-dark" id="projectTeam" name="projectTeam">
 										<!--{{#each users}}
 								  		<option>{{username}}</option>
 								  		{{/each}}-->
