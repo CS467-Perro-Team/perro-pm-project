@@ -80,7 +80,7 @@ app.get('/', (request, response) => {
 
 // Passport Setup
 const passport = require('passport');
-var userProfile;
+/// var userProfile;   global var
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -98,9 +98,23 @@ passport.serializeUser(function(user, cb) {
   cb(null, user);
 });
 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
+passport.deserializeUser(function(user, cb) {
+  cb(null, user);
 });
+
+
+/**  Query functions  **/
+/**
+ *  Functions to add data to the database
+ */
+const insertData = async (collectionName, docName, data) => {
+    if (docName === null) {
+        await firestoreCon.collection(collectionName).doc().set(data);
+    } else {
+        await firestoreCon.collection(collectionName).doc(docName).set(data);
+    }
+}
+
 
 /*  Passport-Google AUTH  */
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -111,11 +125,40 @@ passport.use(new GoogleStrategy({
     // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
   },
   function(accessToken, refreshToken, profile, done) {
-      userProfile=profile;
-      return done(null, userProfile);
+      //const userProfile=profile;
+      const { emails, name } = profile;
+      let emailFromProfile = emails[0].value;
+      // verify that the user is in the DB by getting the user
+      let aUser = getFirestore("Users", emailFromProfile);
+      if (!aUser.username) {
+          // create the new user 
+          let userName = emailFromProfile.split('@')[0];
+          let userRole = "project participant"
+          aUser = {
+              firstName: name.givenName,
+              lastName: name.familyName,
+              useremail: emailFromProfile,
+              username: userName,
+              userrole: userRole 
+          }
+          // insert the new user to the DB
+          insertData("Users", aUser.useremail, aUser);
+      }
+      return done(null, aUser);
   }
 ));
+
+
+/** Middleware to verify that the user is still logged in */
+const isLoggedIn = (req, res, next) => {
+    if (req.user) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+}
  
+
 app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
  
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
@@ -417,7 +460,6 @@ app.get('/logout', function(request,response) {
 
 
 
-
 /** Testing functions **/
 
 // Sitemap for testing - remove when published
@@ -426,11 +468,13 @@ app.get('/siteMap',(request,response) =>{
     response.render('siteMap');
 }); // Sitemap for testing - remove when published
 
+/*
 //Delete below before deploying
 app.get('/sessionInfo', (request, response) => 
-    response.send(userProfile._json.email)
+    //response.send(userProfile._json.email) from global var
     //response.send(userProfile.emails[0].value)
 );
+*/
 //Delete above before deploying
 
 
