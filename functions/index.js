@@ -84,7 +84,7 @@ app.get('/', (request, response) => {
 
 // Passport Setup
 const passport = require('passport');
-var userProfile;
+/// var userProfile;   global var
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -102,28 +102,8 @@ passport.serializeUser(function(user, cb) {
   cb(null, user);
 });
 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
-
-/*  Passport-Google AUTH  */
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-passport.use(new GoogleStrategy({
-    clientID: G_CID,
-    clientSecret: G_CSEC,
-    callbackURL: "http://localhost:5000/auth/google/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
-      userProfile=profile;
-      return done(null, userProfile);
-  }
-));
- 
-app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
- 
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
-    // Successful authentication, redirect success.
-    response.redirect("/projectList");
+passport.deserializeUser(function(user, cb) {
+  cb(null, user);
 });
 
 
@@ -138,6 +118,58 @@ const insertData = async (collectionName, docName, data) => {
         await firestoreCon.collection(collectionName).doc(docName).set(data);
     }
 }
+
+
+/*  Passport-Google AUTH  */
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+passport.use(new GoogleStrategy({
+    clientID: G_CID,
+    clientSecret: G_CSEC,
+    callbackURL: "http://localhost:5000/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+      //const userProfile=profile;
+      const { emails, name } = profile;
+      let emailFromProfile = emails[0].value;
+      // verify that the user is in the DB by getting the user
+      let aUser = getFirestore("Users", emailFromProfile);
+      if (!aUser.username) {
+          // create the new user 
+          let userName = emailFromProfile.split('@')[0];
+          let userRole = "project participant"
+          aUser = {
+              firstName: name.givenName,
+              lastName: name.familyName,
+              useremail: emailFromProfile,
+              username: userName,
+              userrole: userRole 
+          }
+          // insert the new user to the DB
+          insertData("Users", aUser.useremail, aUser);
+      }
+      return done(null, aUser);
+  }
+));
+
+
+/** Middleware to verify that the user is still logged in */
+const isLoggedIn = (req, res, next) => {
+    if (req.user) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+}
+ 
+
+app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+ 
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
+    // Successful authentication, redirect success.
+    response.redirect("/projectList");
+});
+
+
 const giveAListOfDocuments = (collection) => {
     const listOfDocs = [];
     collection.forEach( doc => {
@@ -222,8 +254,9 @@ const createObjectForProjectListView = (projName, taskList) => {
 /** The Project List view **/
 app.get('/projectList',async(request,response) => {
     console.log("sessionID: " + request.sessionID);
-    var useremail = userProfile._json.email;
-    console.log(useremail);
+    // var useremail = userProfile._json.email;  from global var *****
+    ///  console.log(useremail);    DONT NEED *****
+    let useremail = "BHRFGGHHHJJJJKKKKJHHGGFDDDDDDDDDDDDDDDDDDDDDDDD"
     const dbUser = await getFirestore('Users',useremail);
     const projectList = await getCollection('Projects');
     let projectRows = {};
@@ -319,7 +352,6 @@ app.get('/logout', function(request,response) {
 
 
 
-
 /** Testing functions **/
 
 // Sitemap for testing - remove when published
@@ -328,11 +360,13 @@ app.get('/siteMap',(request,response) =>{
     response.render('siteMap');
 }); // Sitemap for testing - remove when published
 
+/*
 //Delete below before deploying
 app.get('/sessionInfo', (request, response) => 
-    response.send(userProfile._json.email)
+    //response.send(userProfile._json.email) from global var
     //response.send(userProfile.emails[0].value)
 );
+*/
 //Delete above before deploying
 
 
