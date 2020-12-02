@@ -79,34 +79,32 @@
   					</div>
 					<div class="col">
 						<form action="/createTask" method="POST">
-							<input type="hidden" id="hiddenProjectName" name="projectName" value='{{dbProjects.projectName}}'>
+							<input type="hidden" id="hiddenProjectName" name="projectName" value='{{dbProjects.projectName}}' required>
 							<div class="row form-group">
 								<label id="taskNameInputLabel" for="taskNameInput">Task Name</label>
 								<div class="col pr-0">
-									<input type="text" class="form-control border border-dark" id="taskName"  placeholder="Enter New Unique Task Name" name="taskName">
+									<input type="text" class="form-control border border-dark" id="taskName"  placeholder="Enter New Unique Task Name" name="taskName" required>
 								</div>
 							</div>
 				
 							<div class="row form-group">
-								<label class="pr-4 mr-1" for="taskDueDate">Due date</label>
+								<label class="pr-4 mr-1" for="taskDueDate" required>Due date</label>
 								<input type="date" class="datepicker pl-2" data-date-format="mm/dd/yyy" id="taskDueDate" name="taskDueDate">
 							</div>
 				
 							<div class="row form-group">
 								<label id="taskAssigneeLabel" class="pr-2" for="taskAssignee">Assign To</label>
 								<div class="col-6">
-									<select id="taskAssignee" class="form-control border border-dark" name="taskAssignee">
-										<!--{{#each projectManagers}}
+									<select id="taskAssignee" class="form-control border border-dark" name="taskAssignee" required>
+										{{#each dbUsers}}
 								  		<option>{{username}}</option>
-								  		{{/each}}-->
-							   			<option>lindorg</option>
-							    		<option>warnemun</option>
+								  		{{/each}}
 									</select>
 								</div>
 							</div>
 							<div class="row form-group">
 								<label id="taskDescriptionInputLabel"for="taskDescriptionInput">Task Description</label>
-								<textarea class="form-control border border-dark" id="taskDescriptionInput"  placeholder="Brief Task Description" name="taskDescription"></textarea>
+								<textarea class="form-control border border-dark" id="taskDescriptionInput"  placeholder="Brief Task Description" name="taskDescription" required></textarea>
 							</div>
 				
 							<div class="row">

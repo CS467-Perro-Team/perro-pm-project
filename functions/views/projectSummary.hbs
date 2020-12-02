@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Single Project</title>
+		<title>Single Project Summary</title>
 		<!-- Latest compiled and minified Bootstrap CSS -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 		<!-- jQuery library -->
@@ -98,10 +98,10 @@
       			<tbody>
 					  {{#each dbTasks}} 
 						<tr scope="row">
-							<td class="taskNameField"><a href="/task">{{taskName}}</a></td>
+							<td class="taskNameField"><a href="/task/{{projectName}}/{{taskName}}">{{taskName}}</a></td>
 							<td class="taskDescriptionField">{{taskDescription}}</td>
-							<td class="taskDueDateField">{{dueDate}}</td>
-							<td class="taskAssignee">{{assignee}}</td>
+							<td class="taskDueDateField">{{taskDueDate}}</td>
+							<td class="taskAssignee">{{taskAssignee}}</td>
 						</tr>
 					  {{/each}}
 	      		</tbody>

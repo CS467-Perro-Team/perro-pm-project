@@ -141,26 +141,13 @@
 				      			</tr>
 			      			</thead>
 			      			<tbody>
+			      				{{#each dbTasks.comments}}
 				      			<tr class="table" scope="row">
-				      				<td class="border-right-dark "><a href="#">{{dbTasks.comments.comment1.commentText}}</a></td>
-				      				<td>{{dbTasks.comments.comment1.commentUsername}}</td>
-				      				<td>{{dbTasks.comments.comment1.commentDate}}</td>
+				      				<td class="border-right-dark"><a href="#">{{commentText}}</a></td>
+				      				<td>{{commentUsername}}</td>
+				      				<td>{{commentDate}}</td>
 				      			</tr>
-				      			<tr class="table" scope="row">
-				      				<td class="border-right-dark "><a href="#">	{{dbTasks.comments.comment2.commentText}}</a></td>
-				      				<td>{{dbTasks.comments.comment2.commentUsername}}</td>
-				      				<td>{{dbTasks.comments.comment2.commentDate}}</td>
-				      			</tr>
-				      			<tr class="table" scope="row">
-				      				<td class="border-right-dark "><a href="#"></a></td>
-				      				<td></td>
-				      				<td></td>
-				      			</tr>
-				      			<tr class="table" scope="row">
-				      				<td class="border-right-dark "><a href="#"></a></td>
-				      				<td></td>
-				      				<td></td>
-				      			</tr>
+			      				{{/each}}
 			  				</tbody>
 	  					</table>
 	  				</div>

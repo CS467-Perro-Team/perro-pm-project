@@ -7,6 +7,33 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<script>
+		HTMLDocument.prototype.ready = function () {
+			return new Promise(function(resolve, reject) {
+				if (document.readyState === 'complete') {
+					resolve(document);
+				} else {
+					document.addEventListener('DOMContentLoaded', function() {
+							resolve(document);
+						});
+				}
+			});
+		}
+		document.ready().then(function(){
+			var a =	document.getElementById("welcomeHeader");
+			var b =	document.getElementById("welcomeMessage");
+			var c = document.getElementById("returnUser");
+			if(document.location.pathname.includes('projectList/welcome')){
+				a.classList.add("d");
+				b.classList.add("d");
+				c.classList.add("d-none");
+			} else {
+				a.classList.add("d-none");
+				b.classList.add("d-none");
+				c.classList.add("d");
+			}
+		});
+		</script>
 		<style>
 			html, body{
 				height: 100%;
@@ -36,8 +63,19 @@
   				</div>
   			</div>
     		<div class="row justify-content-lg-center">
-				<div class="col col-lg-auto pt-0">
+				<div class="col col-lg-auto pt-0" id="welcomeHeader">
+			  		<h1>Welcome {{dbUser.username}}!</h1>
+			  	</div>
+			  	<div class="col col-lg-auto pt-0" id="returnUser">
 			  		<h1>Project List</h1>
+		  		</div>
+		  	</div>
+		  	<div class="row justify-content-lg-center" id="welcomeMessage">
+		  		<div class="col">
+		  		</div>
+		  		<div class="col-6 justify-content-center"><p class="mb-0 justify-content-center">Once you are assigned to a project, you will see the project listed below.</p><p class="mt-0 ml-5">Please contact your PM to be added to your first project.</p>
+		  		</div>
+		  		<div class="col">
 		  		</div>
 		  	</div>
     	</div>
@@ -97,7 +135,7 @@
 	      			<tbody>
 						{{#each projectTable}}
 		      			<tr class="table" scope="row">
-		      				<td class="border-right-dark"><a href="#">{{name}}</a></td>
+		      				<td class="border-right-dark"><a href="/projectSummary/{{name}}">{{name}}</a></td>
 		      				<td>{{completedTasks}}</td>
 		      				<td>{{remainingTasks}}</td>
 		      				<td>{{totalTasks}}</td>
