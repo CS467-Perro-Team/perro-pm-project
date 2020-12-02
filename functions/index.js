@@ -62,7 +62,6 @@ var sessionStuff = {
     cookie:{
         //7 days
         maxAge: 24*60*60*7*1000
-        ////////////////////////////secure: false ////////////
     }
     
 }
@@ -86,19 +85,6 @@ app.get('/', (request, response) => {
 
 
 
-/** Middleware to verify that the user is still logged in */
-/*
-const isLoggedIn = (req, res, next) => {
-    console.log("***THIS IS REQ USER SESSION****\n", req.user);
-    if (req.user) {
-        next();
-    } else {
-        res.sendStatus(401);
-    }
-}
-*/
-
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -109,62 +95,6 @@ app.get('/error', (request, response) =>
     response.render("error", "error logging in")
 );
 
-/*   ORIGINAL
-passport.serializeUser(function(user, cb) {
-    console.log("SERIALIZED USER>>>>", user) ////////
-    cb(null, user);
-});
-
-passport.deserializeUser(function(user, cb) {
-    console.log("DE-SERIALIZED USER>>>>", user) ///////
-    cb(null, user);
-});
-*/
-
-/*  GL 1507
-passport.serializeUser(function(user, done) {
-    console.log("SERIALIZED USER>>>>", user) ////////
-    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
-    done(null, user.useremail);
-});
-*/
-
-/*
-passport.deserializeUser(function(useremail, done) {
-    console.log("DE-SERIALIZED USER>>>>", useremail) ///////
-    done(null, { useremail: useremail});
-});
-*/
-
-/*  GL 1510
-passport.serializeUser(function(user, done) {
-    console.log("SERIALIZED USER>>>>", user) ////////
-    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
-    done(null, user.useremail);
-});
-
-
-passport.deserializeUser(function(useremail, done) {
-    console.log("DE-SERIALIZED USER id>>>>", useremail); ///////
-    User.findById(useremail, function(err, user) {
-        console.log("DE-SERIALIZED USER >>>", user);  /////////////
-        done(err, user);
-    });
-});
-*/
-
-
-/** Middleware to verify that the user is still logged in */
-/*
-const isLoggedIn = (req, res, next) => {
-    console.log("***THIS IS REQ USER SESSION****\n", req.user);
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        res.sendStatus(401);
-    }
-}
-*/
 
 /**  Query functions  **/
 /**
@@ -178,32 +108,14 @@ const insertUserData = async (collectionName, docName, data) => {
     }
 }
 
-/****  THIS IS GOOD CODE DO NOT DELETE *******/
 
 passport.serializeUser((user, done) => {
-    console.log("SERIALIZED USER>>>>", user) ////////
-    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
     done(null, user.useremail);
 });
 
-// From tutorial **** youTube
 passport.deserializeUser((useremail, done) => {
-    console.log("DE-SERIALIZED USER>>>>", useremail) ///////
-    /*User.findById(useremail).then((user) => {
-        done(null, user.useremail);
-    })*/
-
-    /*
-    user.findById(useremail, function(err, user) {
-        console.log("DE-SERIALIZED USER >>>", user);  /////////////
-        done(err, user);
-    });
-    */
-    
-    ///done(null, { useremail: useremail});
-    done(null, useremail);   /// This worked!!!!
+    done(null, useremail);   
 });
-/****  THIS IS GOOD CODE DO NOT DELETE *******/
 
 
 /*  Passport-Google AUTH  */
@@ -213,13 +125,13 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:5000/auth/google/callback"  // local environment
     // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
   },
-  function(accessToken, refreshToken, profile, done) {
+  async function(accessToken, refreshToken, profile, done) {
       const { emails, name } = profile;
       let emailFromProfile = emails[0].value;
       // verify that the user is in the DB by getting the user
       // let aUser = getFirestore("Users", emailFromProfile);
-      let aUser = getUserInfo(emailFromProfile);
-      if (!aUser.username) {
+      let aUser = await getUserInfo(emailFromProfile);
+      if (aUser === undefined) {
           // create the new user 
           let userName = emailFromProfile.split('@')[0];
           let userRole = "project participant"
@@ -233,40 +145,15 @@ passport.use(new GoogleStrategy({
           // insert the new user to the DB
           insertUserData("Users", aUser.useremail, aUser);
           return done(null, aUser)
-      } /*else {
-          done(null, aUser)
-      }*/
-      /////// aUser.id = aUser.useremail;  ///////////////////////////////// NEW CODE ADDED //////////////
+      } 
       return done(null, aUser);
   }
 ));
 
-
-
-
-
-/*  GL 1511
-passport.serializeUser(function(user, done) {
-    console.log("SERIALIZED USER>>>>", user) ////////
-    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
-    done(null, user.useremail);
-});
-
-
-passport.deserializeUser(function(useremail, done) {
-    console.log("DE-SERIALIZED USER id>>>>", useremail); ///////
-    User.findById(useremail, function(err, user) {
-        console.log("DE-SERIALIZED USER >>>", user);  /////////////
-        done(err, user);
-    });
-});
-*/
  
 
-/****  THIS IS GOOD CODE DO NOT DELETE *******/
 /** Middleware to verify that the user is still logged in */
 const isLoggedIn = (req, res, next) => {
-    console.log("***THIS IS REQ USER SESSION****\n", req.user); ///////////////////////////////
     if (req.isAuthenticated()) {
         next();
     } else {
@@ -280,8 +167,6 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     // Successful authentication, redirect success.
     response.redirect("/projectList"); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
-
-/****  THIS IS GOOD CODE DO NOT DELETE *******/
 
 
 /*
@@ -311,18 +196,14 @@ const createNewTask = async(projectName, taskName, taskData) => {
 async function getUserInfo(user) {
     const result = firestoreCon.collection("Users").doc(user).get().then(doc =>{
         if (!doc.exists){
-            if(loginAttempt) {
-                return true; // user that doesn't exist attempting to login
-            } else{
-                console.log('No such user!');
-                return;
-            }
+            console.log('No such user!');
+            return undefined;
         } else {
             return doc.data();
         }
     }).catch( err => {
         console.log('Error getting user', err);
-            return;
+            return undefined;
     });
     return result;
 }
@@ -443,7 +324,6 @@ app.get('/projectList', isLoggedIn, async(request,response) => {
     const user = request.user; 
     const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
-
     var projectRows = {};
     var projectTable = [];
     var taskList = [];
