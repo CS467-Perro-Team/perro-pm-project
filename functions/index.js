@@ -11,6 +11,8 @@ const admin = require('firebase-admin');
 // set up authentication with local environment
 const getMySecretKey = require('./secretKey');  // You need to make your own module
 const serviceAccount = require(getMySecretKey());
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -41,13 +43,15 @@ app.set('views', './views');
 app.set('view engine', 'hbs');
 
 // Config
-const CONFIG = require('./config.js');
+// const CONFIG = require('./config.js');
+const CONFIG = require('./myConfig.js');     // *** DELETE BEFORE FINAL RELEASE ****
 const G_CID = CONFIG.client_id;
 const G_CSEC = CONFIG.client_secret;
 const SECRET = CONFIG.session_secret;
 
 // Google OAuth
 const {OAuth2Client} = require('google-auth-library');
+const { UserBuilder } = require('firebase-functions/lib/providers/auth');
 const client = new OAuth2Client(G_CID);
 
 // Session Setup
@@ -58,7 +62,9 @@ var sessionStuff = {
     cookie:{
         //7 days
         maxAge: 24*60*60*7*1000
+        ////////////////////////////secure: false ////////////
     }
+    
 }
 
 app.set('trust proxy',1);
@@ -78,19 +84,19 @@ app.get('/', (request, response) => {
     response.render('index', {G_CID});
 });
 
-// Passport Setup
-const passport = require('passport');
 
 
 /** Middleware to verify that the user is still logged in */
+/*
 const isLoggedIn = (req, res, next) => {
-    //console.log("THIS IS REQ\n", req);
+    console.log("***THIS IS REQ USER SESSION****\n", req.user);
     if (req.user) {
         next();
     } else {
         res.sendStatus(401);
     }
 }
+*/
 
 
 app.use(passport.initialize());
@@ -103,14 +109,62 @@ app.get('/error', (request, response) =>
     response.render("error", "error logging in")
 );
 
+/*   ORIGINAL
 passport.serializeUser(function(user, cb) {
-  cb(null, user);
+    console.log("SERIALIZED USER>>>>", user) ////////
+    cb(null, user);
 });
 
 passport.deserializeUser(function(user, cb) {
-  cb(null, user);
+    console.log("DE-SERIALIZED USER>>>>", user) ///////
+    cb(null, user);
+});
+*/
+
+/*  GL 1507
+passport.serializeUser(function(user, done) {
+    console.log("SERIALIZED USER>>>>", user) ////////
+    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
+    done(null, user.useremail);
+});
+*/
+
+/*
+passport.deserializeUser(function(useremail, done) {
+    console.log("DE-SERIALIZED USER>>>>", useremail) ///////
+    done(null, { useremail: useremail});
+});
+*/
+
+/*  GL 1510
+passport.serializeUser(function(user, done) {
+    console.log("SERIALIZED USER>>>>", user) ////////
+    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
+    done(null, user.useremail);
 });
 
+
+passport.deserializeUser(function(useremail, done) {
+    console.log("DE-SERIALIZED USER id>>>>", useremail); ///////
+    User.findById(useremail, function(err, user) {
+        console.log("DE-SERIALIZED USER >>>", user);  /////////////
+        done(err, user);
+    });
+});
+*/
+
+
+/** Middleware to verify that the user is still logged in */
+/*
+const isLoggedIn = (req, res, next) => {
+    console.log("***THIS IS REQ USER SESSION****\n", req.user);
+    if (req.isAuthenticated()) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+}
+*/
 
 /**  Query functions  **/
 /**
@@ -124,9 +178,35 @@ const insertUserData = async (collectionName, docName, data) => {
     }
 }
 
+/****  THIS IS GOOD CODE DO NOT DELETE *******/
+
+passport.serializeUser((user, done) => {
+    console.log("SERIALIZED USER>>>>", user) ////////
+    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
+    done(null, user.useremail);
+});
+
+// From tutorial **** youTube
+passport.deserializeUser((useremail, done) => {
+    console.log("DE-SERIALIZED USER>>>>", useremail) ///////
+    /*User.findById(useremail).then((user) => {
+        done(null, user.useremail);
+    })*/
+
+    /*
+    user.findById(useremail, function(err, user) {
+        console.log("DE-SERIALIZED USER >>>", user);  /////////////
+        done(err, user);
+    });
+    */
+    
+    ///done(null, { useremail: useremail});
+    done(null, useremail);   /// This worked!!!!
+});
+/****  THIS IS GOOD CODE DO NOT DELETE *******/
+
 
 /*  Passport-Google AUTH  */
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 passport.use(new GoogleStrategy({
     clientID: G_CID,
     clientSecret: G_CSEC,
@@ -152,13 +232,47 @@ passport.use(new GoogleStrategy({
           }
           // insert the new user to the DB
           insertUserData("Users", aUser.useremail, aUser);
-      }
+          return done(null, aUser)
+      } /*else {
+          done(null, aUser)
+      }*/
+      /////// aUser.id = aUser.useremail;  ///////////////////////////////// NEW CODE ADDED //////////////
       return done(null, aUser);
   }
 ));
 
 
+
+
+
+/*  GL 1511
+passport.serializeUser(function(user, done) {
+    console.log("SERIALIZED USER>>>>", user) ////////
+    console.log("SERIALIZED USER ID>>>>", user.useremail) ////////
+    done(null, user.useremail);
+});
+
+
+passport.deserializeUser(function(useremail, done) {
+    console.log("DE-SERIALIZED USER id>>>>", useremail); ///////
+    User.findById(useremail, function(err, user) {
+        console.log("DE-SERIALIZED USER >>>", user);  /////////////
+        done(err, user);
+    });
+});
+*/
  
+
+/****  THIS IS GOOD CODE DO NOT DELETE *******/
+/** Middleware to verify that the user is still logged in */
+const isLoggedIn = (req, res, next) => {
+    console.log("***THIS IS REQ USER SESSION****\n", req.user); ///////////////////////////////
+    if (req.isAuthenticated()) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+}
 
 app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
  
@@ -167,6 +281,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     response.redirect("/projectList"); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
 
+/****  THIS IS GOOD CODE DO NOT DELETE *******/
 
 
 /*
@@ -323,8 +438,9 @@ const getDocumentList = (collection) => {
 
 /** Routes */
 /** The Project List view **/
-app.get('/projectList', async(request,response) => {
-    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+app.get('/projectList', isLoggedIn, async(request,response) => {
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const user = request.user; 
     const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
 
@@ -367,8 +483,9 @@ app.get('/projectList/:useremail', async(request,response) => {
 });
 
 /** The Create Project View **/
-app.get('/createProject', async(request,response) => {
-    const user = "warnemun@oregonstate.edu"; //
+app.get('/createProject', isLoggedIn, async(request,response) => {
+    // const user = "warnemun@oregonstate.edu"; //
+    const user = request.user; 
     const dbUser = await getUserInfo(user);
     /* Add Functionality for getting all project managers and all users*/
         // const dbPMs = await getProjectManagers('Users');
@@ -389,8 +506,9 @@ app.post('/createProject', (request, response) => {
 });
 
 /** Task View **/
-app.get('/task/:projectName/:taskName', async(request,response) =>{
-    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const user = request.user; 
     const projectName = request.params.projectName;
     var taskName = request.params.taskName;
 
@@ -402,8 +520,9 @@ app.get('/task/:projectName/:taskName', async(request,response) =>{
 });
 
 /** Create Task Functionality **/
-app.get('/createTask/:projectName', async(request,response) =>{
-    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+app.get('/createTask/:projectName',  isLoggedIn, async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const user = request.user; 
     const projectName = request.params.projectName;
 
     const dbProjects = await getProjectInfo(projectName);
@@ -425,8 +544,9 @@ app.post('/createTask', (request, response) =>{
 });
 
 /** The Single Project Summary view */
-app.get('/projectSummary/:projectName', async(request,response) =>{
-    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+app.get('/projectSummary/:projectName', isLoggedIn, async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const user = request.user; 
     const projectName = request.params.projectName;
 
     const dbProjects = await getProjectInfo(projectName);
@@ -437,8 +557,9 @@ app.get('/projectSummary/:projectName', async(request,response) =>{
 });
 
 /** The Single Project Tracking view */
-app.get('/projectTracking/:projectName', async(request,response) =>{
-    const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+app.get('/projectTracking/:projectName', isLoggedIn, async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const user = request.user; 
     const projectName = request.params.projectName;
     
     const dbProjects = await getProjectInfo(projectName);
