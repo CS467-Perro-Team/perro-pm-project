@@ -79,8 +79,10 @@ const isLoggedIn = (req, res, next) => {
     //console.log("THIS IS REQ\n", req);
     if (req.user) {
         next();
+        return;
     } else {
         res.sendStatus(401);
+        return;
     }
 }
 
@@ -129,9 +131,9 @@ passport.use(new GoogleStrategy({
             }
             // insert the new user to the DB
             insertUserData("Users", aUser.useremail, aUser);
-            aUser.newUser = "t"; // Temp solution for welecome message for new user
+            aUser.newUser = "welcome"; // Temp solution for welecome message for new user
         } else{
-            aUser.newUser = "f" // Temp solution for hiding welecom message for returning user
+            aUser.newUser = "return" // Temp solution for hiding welecom message for returning user
         }
         return done(null, aUser);
     }
@@ -143,7 +145,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     // Successful authentication, redirect success.
     const useremail = request.user.useremail;   // Added for temp solution to identify new user
     const newuser = request.user.newUser;       // Added for temp solution to identify new user
-    const redirectURL = "/projectList/" + useremail + "/" + newuser;    // Added for temp solution to identify new user
+    const redirectURL = "/projectList/" + newuser + "/" + useremail;    // Added for temp solution to identify new user
     response.redirect(redirectURL); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
 
@@ -338,7 +340,7 @@ app.get('/projectList/:useremail',async(request,response) => {
     }
     response.render('projectList',{dbUser,projectTable});
 });
-app.get('/projectList/:useremail/:newuser',async(request,response) => {
+app.get('/projectList/:newuser/:useremail',async(request,response) => {
     // console.log(request);  // Verify what's avail in the request
     const user = request.params.useremail; // Assign the user identefier here -> whatever is the document name for the logged in user
     const dbUser = await getUserInfo(user);
