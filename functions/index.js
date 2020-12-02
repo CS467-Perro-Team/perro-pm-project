@@ -44,7 +44,7 @@ app.set('view engine', 'hbs');
 
 // Config
 const CONFIG = require('./config.js');
-// const CONFIG = require('./myConfig.js');     // *** DELETE BEFORE FINAL RELEASE ****
+//const CONFIG = require('./myConfig.js');     // *** DELETE BEFORE FINAL RELEASE ****
 const G_CID = CONFIG.client_id;
 const G_CSEC = CONFIG.client_secret;
 const SECRET = CONFIG.session_secret;
@@ -196,20 +196,10 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     // Successful authentication, redirect success.
     const useremail = request.user.useremail;   // Added for temp solution to identify new user
     const newuser = request.user.newUser;       // Added for temp solution to identify new user
-    const redirectURL = "/projectList/" + newuser + "/" + useremail;    // Added for temp solution to identify new user
+    const redirectURL = "/projectList"; 
     response.redirect(redirectURL); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
 
-/*
- *  Functions to add/update database
- */
-const insertUserData = async (collectionName, docName, data) => {
-    if (docName === null) {
-        await firestoreCon.collection(collectionName).doc().set(data);
-    } else {
-        await firestoreCon.collection(collectionName).doc(docName).set(data);
-    }
-}
 // Create New Project
 const createNewProject = async (projectName, projectData) => {
     try{
