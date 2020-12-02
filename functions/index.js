@@ -320,7 +320,6 @@ const getDocumentList = (collection) => {
 /** Routes */
 /** The Project List view **/
 app.get('/projectList', isLoggedIn, async(request,response) => {
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const user = request.user; 
     const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
@@ -364,7 +363,6 @@ app.get('/projectList/:useremail', async(request,response) => {
 
 /** The Create Project View **/
 app.get('/createProject', isLoggedIn, async(request,response) => {
-    // const user = "warnemun@oregonstate.edu"; //
     const user = request.user; 
     const dbUser = await getUserInfo(user);
     /* Add Functionality for getting all project managers and all users*/
@@ -387,7 +385,6 @@ app.post('/createProject', (request, response) => {
 
 /** Task View **/
 app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const user = request.user; 
     const projectName = request.params.projectName;
     var taskName = request.params.taskName;
@@ -401,7 +398,6 @@ app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
 
 /** Create Task Functionality **/
 app.get('/createTask/:projectName',  isLoggedIn, async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const user = request.user; 
     const projectName = request.params.projectName;
 
@@ -425,7 +421,6 @@ app.post('/createTask', (request, response) =>{
 
 /** The Single Project Summary view */
 app.get('/projectSummary/:projectName', isLoggedIn, async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const user = request.user; 
     const projectName = request.params.projectName;
 
@@ -438,7 +433,6 @@ app.get('/projectSummary/:projectName', isLoggedIn, async(request,response) =>{
 
 /** The Single Project Tracking view */
 app.get('/projectTracking/:projectName', isLoggedIn, async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
     const user = request.user; 
     const projectName = request.params.projectName;
     
