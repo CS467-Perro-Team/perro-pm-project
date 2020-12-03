@@ -72,7 +72,7 @@
 	    		<div class="col-10 empty-container">
 			  	</div>
 				<div class="col-1 justify-content-lg-right">
-					<h4 id="logo"><a href="/">mypmwork.com</a></h4>
+					<h4 id="logo"><a href="/siteMap">mypmwork.com</a></h4>
   				</div>
   			</div>
     		<div class="row justify-content-lg-center">
@@ -124,6 +124,7 @@
 			        }
 			    },
 			    xAxis: {
+			    	type: 'datetime',
 			        accessibility: {
 			            rangeDescription: 'Range: {{dbProjects.projectStartDate}} to {{dbProjects.projectDueDate}}'
 			        }
@@ -138,18 +139,22 @@
 			            label: {
 			                connectorAllowed: false
 		    	        },
-		        	    pointStart: {{dbProjects.projectStartDate}}
+		        	    pointStart: Date.UTC({{startDate}}),
+		        	    pointInterval:  7*24*3600*1000
 		        	}
 		    	},
 		    	series: [{
 		        	name: 'Progress',
-		        	data: [0, 1, 1, 7, 7, 10, 13, 17,'','','']
+		        	// data: [0, 1, 1, 7, 7, 10, 13, 17,'','','']
+		        	data: [{{chartData.complete}}]
 		    	}, {
 		        	name: 'Remaining',
-		        	data: [10, 13, 13, 10, 11, 11, 10, 6,'','','']
+		        	// data: [10, 13, 13, 10, 11, 11, 10, 6,'','','']
+		        	data: [{{chartData.open}}]
 			    }, {
 			        name: 'Total',
-			        data: [10, 14, 14, 17, 18, 21, 23, 23,23,23,23]
+			        // data: [10, 14, 14, 17, 18, 21, 23, 23,23,23,23]
+			        data: [{{chartData.total}}]
 			    }],
 		    	responsive: {
 			        rules: [{
@@ -206,9 +211,9 @@
 	    		<!-- Begin Middle column -->
 				<div class="col-6">
 					<ul class="nav justify-content-center">
-						<li class="nav-item"><a class="nav-link" href="/">mypmwork.com</a></li>
-						<li class="nav-item"><a class="nav-link" href="/">help</a></li>
-						<li class="nav-item"><a class="nav-link" href="/">resources</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">mypmwork.com</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">help</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">resources</a></li>
 						<li class="nav-item"><a class="nav-link" href="/siteMap">about</a></li>
 						<li class="nav-item"><a class="nav-link" href="/logout">sign out</a></li>
 					</ul>

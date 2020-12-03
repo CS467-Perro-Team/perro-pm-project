@@ -11,8 +11,6 @@ const admin = require('firebase-admin');
 // set up authentication with local environment
 const getMySecretKey = require('./secretKey');  // You need to make your own module
 const serviceAccount = require(getMySecretKey());
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -44,13 +42,13 @@ app.set('view engine', 'hbs');
 
 // Config
 const CONFIG = require('./config.js');
-//const CONFIG = require('./myConfig.js');     // *** DELETE BEFORE FINAL RELEASE ****
 const G_CID = CONFIG.client_id;
 const G_CSEC = CONFIG.client_secret;
 const SECRET = CONFIG.session_secret;
 
 // Google OAuth
 const {OAuth2Client} = require('google-auth-library');
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const { UserBuilder } = require('firebase-functions/lib/providers/auth');
 const client = new OAuth2Client(G_CID);
 
@@ -63,7 +61,6 @@ var sessionStuff = {
         //7 days
         maxAge: 24*60*60*7*1000
     }
-    
 }
 
 app.set('trust proxy',1);
@@ -71,12 +68,8 @@ app.use(session(sessionStuff));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-//Login Page
-app.get('/', (request, response) => {
-    response.render('index', {G_CID});
-});
-
-
+// Passport Setup
+const passport = require('passport');
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -87,20 +80,6 @@ app.get('/error', (request, response) =>
     response.render("error", "error logging in")
 );
 
-
-/**  Query functions  **/
-/**
- *  Functions to add data to the database
- */
-const insertUserData = async (collectionName, docName, data) => {
-    if (docName === null) {
-        await firestoreCon.collection(collectionName).doc().set(data);
-    } else {
-        await firestoreCon.collection(collectionName).doc(docName).set(data);
-    }
-}
-
-
 passport.serializeUser((user, done) => {
     done(null, user.useremail);
 });
@@ -108,8 +87,6 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((useremail, done) => {
     done(null, useremail);   
 });
-
-
 /*  Passport-Google AUTH  */
 /*   // WELCOME MESSAGE TO NEW USER FEATURE
 passport.use(new GoogleStrategy({
@@ -145,8 +122,6 @@ passport.use(new GoogleStrategy({
     }
 ));
 */
-
-
 /*  Passport-Google AUTH  */
 passport.use(new GoogleStrategy({
     clientID: G_CID,
@@ -154,42 +129,31 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:5000/auth/google/callback"  // local environment
     // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
     },
-  async function(accessToken, refreshToken, profile, done) {
-      const { emails, name } = profile;
-      let emailFromProfile = emails[0].value;
-      // verify that the user is in the DB by getting the user
-      // let aUser = getFirestore("Users", emailFromProfile);
-      let aUser = await getUserInfo(emailFromProfile);
-      if (aUser === undefined) {
-          // create the new user 
-          let userName = emailFromProfile.split('@')[0];
-          let userRole = "project participant"
-          aUser = {
-              firstName: name.givenName,
-              lastName: name.familyName,
-              useremail: emailFromProfile,
-              username: userName,
-              userrole: userRole 
-          }
-          // insert the new user to the DB
-          insertUserData("Users", aUser.useremail, aUser);
-          return done(null, aUser)
-      } 
-      return done(null, aUser);
-  }
-));
-
-
-
-/** Middleware to verify that the user is still logged in */
-const isLoggedIn = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        res.sendStatus(401);
+    async function(accessToken, refreshToken, profile, done) {
+        const { emails, name } = profile;
+        let emailFromProfile = emails[0].value;
+        // verify that the user is in the DB by getting the user
+        // let aUser = getFirestore("Users", emailFromProfile);
+        let aUser = await getUserInfo(emailFromProfile);
+        if (aUser === undefined) {
+            // create the new user 
+            let userName = emailFromProfile.split('@')[0];
+            let userRole = "project participant"
+            aUser = {
+                firstName: name.givenName,
+                lastName: name.familyName,
+                useremail: emailFromProfile,
+                username: userName,
+                userrole: userRole 
+            }
+            // insert the new user to the DB
+            insertUserData("Users", aUser.useremail, aUser);
+            return done(null, aUser)
+        } 
+        return done(null, aUser);
     }
-}
-
+));
+ 
 app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
  
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
@@ -200,6 +164,27 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     response.redirect(redirectURL); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
 
+/** Middleware to verify that the user is still logged in */
+const isLoggedIn = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        next();
+        return;
+    } else {
+        res.sendStatus(401);
+        return;
+    }
+}
+
+/*
+ *  Functions to add/update database
+ */
+const insertUserData = async (collectionName, docName, data) => {
+    if (docName === null) {
+        await firestoreCon.collection(collectionName).doc().set(data);
+    } else {
+        await firestoreCon.collection(collectionName).doc(docName).set(data);
+    }
+}
 // Create New Project
 const createNewProject = async (projectName, projectData) => {
     try{
@@ -216,7 +201,14 @@ const createNewTask = async(projectName, taskName, taskData) => {
         console.log(e);
     }
 }
-
+// Create New comment
+// const createNewComment = async(projectName, taskName, commentData) => {
+//     try{
+//         await firestoreCon.collection("Projects").doc(projectName).collection("Tasks").doc(taskName).update(commentData);
+//     } catch(e){
+//         console.log(e);
+//     }
+// }
 /*
 *  Functions to retrieve data from database
 */
@@ -306,7 +298,7 @@ const createObjectForProjectListView = (projName, taskList) => {
         // get completed tasks count
         let count = 0;
         for (let i = 0; i < taskList.length; ++i) {
-            if (taskList[i].completed) {
+            if (taskList[i].taskStatus === 'complete') {
                 count += 1;
             }
         }
@@ -335,35 +327,89 @@ const getDocumentList = (collection) => {
     })
     return listOfDocs;
 }
+/*Tracking Helper functions*/
+// Helper function to get date range for chart between project start/finish
+const getDateRange = function(min_date, max_date){
+    // Find the start and end in 1w offsets.
+    var start = new Date(min_date);
+    start.setDate(min_date.getDate());
+    var end = new Date(max_date);
+    end.setDate(end.getDate() + 7);
+    // Generate the date range in 1w increments.
+    var date_range = [];
+    while (start <= end) {
+        date_range.push(start.toString());
+        start.setDate(start.getDate() + 7);
+    }
+    return date_range;
+}
+
+// Helper function to set chart data
+const setChartData = (tasks, chartDates) => {
+    try{
+        var projData = {
+                plotDate: [],
+                open: [],
+                complete: [],
+                total:[]
+        }
+        
+        for(var i=0;i<chartDates.length;i++){ //for each plot point
+            var openTasks = 0;
+            var closedTasks = 0;
+            var totalTasks = 0;
+            var chartDate = chartDates[i];
+
+            projData.plotDate.push(chartDate.toString());
+            
+            for(task in tasks){ // check all tasks in the project
+                const ts = tasks[task].taskStartDate.toDate();
+                const taskStatus = tasks[task].taskStatus;
+                var taskCompleteDate = undefined;
+                if(tasks[task].taskCompleteDate){
+                    taskCompleteDate = tasks[task].taskCompleteDate.toDate();
+                }
+
+                var taskStart = new Date(ts);
+                taskStart.setDate(ts.getDate());
+
+                var plotDate = new Date(chartDate);
+                if(taskStart <= plotDate){ //check if tasks open by plot date
+                    totalTasks++;
+                    if(taskStatus === 'open'){ //if yes and status open, count as open
+                        openTasks++;
+                    } else { // if yes and not open, count as closed
+                        if((taskCompleteDate) && (taskCompleteDate <= plotDate)){
+                            closedTasks++;
+                        } else {
+                            openTasks++;
+                        }
+                    }
+                }
+            }
+            projData.open.push(openTasks);
+            projData.complete.push(closedTasks);
+            projData.total.push(totalTasks);
+        }
+        return projData;
+    } catch(e){
+        console.log("Chart data error: ",e);
+        return;
+    }
+
+}
 
 /** Routes */
+/** The Login Page **/
+app.get('/', (request, response) => {
+    response.render('index', {G_CID});
+});
+
 /** The Project List view **/
-app.get('/projectList', isLoggedIn, async(request,response) => {
+app.get('/projectList',isLoggedIn, async(request,response) => {
     const user = request.user; 
     const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
-    var projectRows = {};
-    var projectTable = [];
-    var taskList = [];
-    
-    for (project of projectList) {
-        taskList.push(getTaskListFromAProject(project.projectName));
-    }
-    
-    const taskCollection = await Promise.all(taskList);
-    
-    for (var i = 0; i < projectList.length; ++i) {
-        projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
-        projectTable.push(projectRows);
-    }
-    response.render('projectList',{dbUser,projectTable});
-});
-
-/*   // WELCOME MESSAGE TO NEW USER FEATURE
-app.get('/projectList/:useremail',async(request,response) => {
-    const user = request.params.useremail;
-    const dbUser = await getUserInfo(user);
-    const projectList = await getCollection('Projects');
 
     var projectRows = {};
     var projectTable = [];
@@ -381,33 +427,54 @@ app.get('/projectList/:useremail',async(request,response) => {
     }
     response.render('projectList',{dbUser,projectTable});
 });
-app.get('/projectList/:newuser/:useremail',async(request,response) => {
-    // console.log(request);  // Verify what's avail in the request
-    const user = request.params.useremail; // Assign the user identefier here -> whatever is the document name for the logged in user
-    const dbUser = await getUserInfo(user);
-    const projectList = await getCollection('Projects');
 
-    var projectRows = {};
-    var projectTable = [];
-    var taskList = [];
+// app.get('/projectList/:useremail',async(request,response) => {
+//     const user = request.params.useremail;
+//     const dbUser = await getUserInfo(user);
+//     const projectList = await getCollection('Projects');
+
+//     var projectRows = {};
+//     var projectTable = [];
+//     var taskList = [];
     
-    for (project of projectList) {
-        taskList.push(getTaskListFromAProject(project.projectName));
-    }
+//     for (project of projectList) {
+//         taskList.push(getTaskListFromAProject(project.projectName));
+//     }
     
-    const taskCollection = await Promise.all(taskList);
+//     const taskCollection = await Promise.all(taskList);
     
-    for (var i = 0; i < projectList.length; ++i) {
-        projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
-        projectTable.push(projectRows);
-    }
-    response.render('projectList',{dbUser,projectTable});
-});
-*/
+//     for (var i = 0; i < projectList.length; ++i) {
+//         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
+//         projectTable.push(projectRows);
+//     }
+//     response.render('projectList',{dbUser,projectTable});
+// });
+// app.get('/projectList/:newuser/:useremail',async(request,response) => {
+//     // console.log(request);  // Verify what's avail in the request
+//     const user = request.params.useremail; // Assign the user identefier here -> whatever is the document name for the logged in user
+//     const dbUser = await getUserInfo(user);
+//     const projectList = await getCollection('Projects');
+
+//     var projectRows = {};
+//     var projectTable = [];
+//     var taskList = [];
+    
+//     for (project of projectList) {
+//         taskList.push(getTaskListFromAProject(project.projectName));
+//     }
+    
+//     const taskCollection = await Promise.all(taskList);
+    
+//     for (var i = 0; i < projectList.length; ++i) {
+//         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
+//         projectTable.push(projectRows);
+//     }
+//     response.render('projectList',{dbUser,projectTable});
+// });
 
 /** The Create Project View **/
 app.get('/createProject', isLoggedIn, async(request,response) => {
-    const user = request.user; 
+    const user = request.user;
     const dbUser = await getUserInfo(user);
     const dbUsers = await getCollection("Users");
     /* Add Functionality for getting all project managers and all users*/
@@ -425,6 +492,25 @@ app.post('/createProject', (request, response) => {
     createNewProject(data.projectName, data);
     response.redirect("/projectSummary/" + data.projectName);
 });
+/** Create Comment Functionality **/
+// app.post('/createComment', (request, response) => {
+//     console.log(request);
+//     const data = request.body;
+//     data.commentName = "";
+//     data.comments = { comments: 
+//         {
+//             commentName: {
+//                 commentUsername: data.commentUsername,
+//                 commentText: data.commentname,
+//                 commentDate: admin.firestore.Timestamp.fromDate(new Date())
+//             }
+//         }
+//     }
+
+//     // Add new project to database
+//     createNewComment(data.projectName, data.taskName, data);
+//     response.redirect("/task/:" + data.projectName + "/:" + data.taskName);
+// });
 
 /** Task View **/
 app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
@@ -446,9 +532,21 @@ app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
     //const dbComments = await getTaskComments(projectName, taskName);
     response.render('task',{dbProjects,dbUser,dbTasks});
 });
+/** Comment View **/
+// app.get('/createComment/:projectName/:taskName',async(request,response) =>{
+//     const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+//     const projectName = request.params.projectName;
+//     var taskName = request.params.taskName;
 
+//     const dbProjects = await getProjectInfo(projectName);
+//     const dbUser = await getUserInfo(user);
+//     const dbTasks = await getTaskInfo(projectName,taskName);
+
+//     //const dbComments = await getTaskComments(projectName, taskName);
+//     response.render('createComment',{dbProjects,dbUser,dbTasks});
+// });
 /** Create Task Functionality **/
-app.get('/createTask/:projectName',  isLoggedIn, async(request,response) =>{
+app.get('/createTask/:projectName', isLoggedIn, async(request,response) =>{
     const user = request.user; 
     const projectName = request.params.projectName;
 
@@ -498,13 +596,23 @@ app.get('/projectTracking/:projectName', isLoggedIn, async(request,response) =>{
     const dbProjects = await getProjectInfo(projectName);
     const dbUser = await getUserInfo(user); 
     const dbTasks = await getTaskListFromAProject(projectName);
+    const dateRange = getDateRange(dbProjects.projectStartDate.toDate(), dbProjects.projectDueDate.toDate());
+    var chartData = [];
+    chartData = setChartData(dbTasks, dateRange);
 
     // Convert start and due date to MM/DD/YYY format
-    dbProjects.projectStartDate = new Date(dbProjects.projectStartDate._seconds * 1000).toLocaleString().split(',')[0];
+    var startDate = dbProjects.projectStartDate = new Date(dbProjects.projectStartDate._seconds * 1000).toLocaleString().split(',')[0];
     dbProjects.projectDueDate = new Date(dbProjects.projectDueDate._seconds * 1000).toLocaleString().split(',')[0];
     
-    response.render('projectTracking',{dbProjects,dbUser,dbTasks});
+    // Format start date for highcharts
+    var year = dbProjects.projectStartDate.split('/')[2];
+    var month = dbProjects.projectStartDate.split('/')[0];
+    var day = dbProjects.projectStartDate.split('/')[1];
+    // Start date - 1 -> Highcharts adds 30 days to start of chart - we want start of project
+    startDate = year +',' + (month-1) + ',' + day;
+    response.render('projectTracking',{dbProjects,dbUser,dbTasks,startDate,chartData});
 });
+
 
 /** The Sign Up View*/
 app.get('/signUp', async(request,response) =>{
@@ -517,6 +625,8 @@ app.get('/logout', function(request,response) {
         response.redirect('/');
     });
 });
+
+
 
 
 
