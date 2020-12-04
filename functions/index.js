@@ -4,11 +4,11 @@ const admin = require('firebase-admin');
 // Credentialed setup
 /*Replacement code for deploying to firebase hosted site*/
 //Authorize your application to access your Firestore DB
-//admin.initializeApp(functions.config().firebase);
+// admin.initializeApp(functions.config().firebase);
 /*Replacement code for deploying to firebase hosted site*/
 
 /*Replace this code block with replacement code above*/
-// set up authentication with local environment
+// // set up authentication with local environment
 const getMySecretKey = require('./secretKey');  // You need to make your own module
 const serviceAccount = require(getMySecretKey());
 
@@ -49,14 +49,14 @@ const SECRET = CONFIG.session_secret;
 // Google OAuth
 const {OAuth2Client} = require('google-auth-library');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const { UserBuilder } = require('firebase-functions/lib/providers/auth');
+// const { UserBuilder } = require('firebase-functions/lib/providers/auth');
 const client = new OAuth2Client(G_CID);
 
 // Session Setup
 var sessionStuff = {
     secret: SECRET,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie:{
         //7 days
         maxAge: 24*60*60*7*1000
@@ -72,73 +72,43 @@ app.use(bodyParser.urlencoded({extended: true}));
 const passport = require('passport');
 app.use(passport.initialize());
 app.use(passport.session());
+var userProfile;
+
 
 app.get('/success', (request, response) => 
-    response.redirect("projectList")
+    //response.redirect("/projectList")
+    response.send(userProfile)
 );
 app.get('/error', (request, response) => 
     response.render("error", "error logging in")
 );
 
-passport.serializeUser((user, done) => {
-    done(null, user.useremail);
+passport.serializeUser(function(user, cb){
+    cb(null, user);
 });
 
-passport.deserializeUser((useremail, done) => {
-    done(null, useremail);   
+passport.deserializeUser(function(obj, cb){
+    cb(null, obj);   
 });
-/*  Passport-Google AUTH  */
-/*   // WELCOME MESSAGE TO NEW USER FEATURE
-passport.use(new GoogleStrategy({
-    clientID: G_CID,
-    clientSecret: G_CSEC,
-    callbackURL: "http://localhost:5000/auth/google/callback"  // local environment
-    // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
-    },
-    function(accessToken, refreshToken, profile, done) {
-        //console.log(profile); // To see what's availaable from profile
-        const { emails, name } = profile;
-        let emailFromProfile = emails[0].value;
-        // verify that the user is in the DB by getting the user
-        let aUser = getUserInfo(emailFromProfile);
-        if (!aUser.username) {
-            // create the new user 
-            let userName = emailFromProfile.split('@')[0];
-            let userRole = "project participant"
-            aUser = {
-                firstName: name.givenName,
-                lastName: name.familyName,
-                useremail: emailFromProfile,
-                username: userName,
-                userrole: userRole 
-            }
-            // insert the new user to the DB
-            insertUserData("Users", aUser.useremail, aUser);
-            aUser.newUser = "welcome"; // Temp solution for welecome message for new user
-        } else{
-            aUser.newUser = "return" // Temp solution for hiding welecom message for returning user
-        }
-        return done(null, aUser);
-    }
-));
-*/
+
 /*  Passport-Google AUTH  */
 passport.use(new GoogleStrategy({
     clientID: G_CID,
     clientSecret: G_CSEC,
-    callbackURL: "http://localhost:5000/auth/google/callback"  // local environment
-    // callbackURL: "https://mypmwork.com/auth/google/callback" // live site
+    // callbackURL: "http://localhost:5000/auth/google/callback"  // local environment
+    callbackURL: "https://mypmwork.com/auth/google/callback" // live site
     },
     async function(accessToken, refreshToken, profile, done) {
-        const { emails, name } = profile;
-        let emailFromProfile = emails[0].value;
+        var { emails, name } = profile;
+        var emailFromProfile = emails[0].value;
+        console.log(emailFromProfile);
         // verify that the user is in the DB by getting the user
         // let aUser = getFirestore("Users", emailFromProfile);
-        let aUser = await getUserInfo(emailFromProfile);
+        var aUser = await getUserInfo(emailFromProfile);
         if (aUser === undefined) {
             // create the new user 
-            let userName = emailFromProfile.split('@')[0];
-            let userRole = "project participant"
+            var userName = emailFromProfile.split('@')[0];
+            var userRole = "project participant";
             aUser = {
                 firstName: name.givenName,
                 lastName: name.familyName,
@@ -158,22 +128,18 @@ app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'e
  
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: "/signUp" }), function(request, response) {
     // Successful authentication, redirect success.
-    const useremail = request.user.useremail;   // Added for temp solution to identify new user
-    const newuser = request.user.newUser;       // Added for temp solution to identify new user
-    const redirectURL = "/projectList"; 
-    response.redirect(redirectURL); // this may be a place to add /<useremail> when user is authenticated & can update route
+    response.redirect('/projectList'); // this may be a place to add /<useremail> when user is authenticated & can update route
 });
 
 /** Middleware to verify that the user is still logged in */
-const isLoggedIn = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-        return;
-    } else {
-        res.sendStatus(401);
-        return;
-    }
-}
+// const isLoggedIn = (req, res, next) => {
+//     if (req.isAuthenticated()) {
+//         next();
+//         return;
+//     } else {
+//         res.sendStatus(401);
+//     }
+// }
 
 /*
  *  Functions to add/update database
@@ -213,16 +179,17 @@ const createNewTask = async(projectName, taskName, taskData) => {
 *  Functions to retrieve data from database
 */
 async function getUserInfo(user) {
+    console.log("gui", user);
     const result = firestoreCon.collection("Users").doc(user).get().then(doc =>{
         if (!doc.exists){
             console.log('No such user!');
-            return undefined;
+            return;
         } else {
             return doc.data();
         }
     }).catch( err => {
         console.log('Error getting user', err);
-            return undefined;
+            return;
     });
     return result;
 }
@@ -406,9 +373,11 @@ app.get('/', (request, response) => {
 });
 
 /** The Project List view **/
-app.get('/projectList',isLoggedIn, async(request,response) => {
-    const user = request.user; 
-    const dbUser = await getUserInfo(user);
+app.get('/projectList',async(request,response) => {
+    dbUser = request.useremail;
+
+    console.log("projectList: ",request.useremail);
+    // const dbUser = await getUserInfo(user);
     const projectList = await getCollection('Projects');
 
     var projectRows = {};
@@ -428,54 +397,12 @@ app.get('/projectList',isLoggedIn, async(request,response) => {
     response.render('projectList',{dbUser,projectTable});
 });
 
-// app.get('/projectList/:useremail',async(request,response) => {
-//     const user = request.params.useremail;
-//     const dbUser = await getUserInfo(user);
-//     const projectList = await getCollection('Projects');
-
-//     var projectRows = {};
-//     var projectTable = [];
-//     var taskList = [];
-    
-//     for (project of projectList) {
-//         taskList.push(getTaskListFromAProject(project.projectName));
-//     }
-    
-//     const taskCollection = await Promise.all(taskList);
-    
-//     for (var i = 0; i < projectList.length; ++i) {
-//         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
-//         projectTable.push(projectRows);
-//     }
-//     response.render('projectList',{dbUser,projectTable});
-// });
-// app.get('/projectList/:newuser/:useremail',async(request,response) => {
-//     // console.log(request);  // Verify what's avail in the request
-//     const user = request.params.useremail; // Assign the user identefier here -> whatever is the document name for the logged in user
-//     const dbUser = await getUserInfo(user);
-//     const projectList = await getCollection('Projects');
-
-//     var projectRows = {};
-//     var projectTable = [];
-//     var taskList = [];
-    
-//     for (project of projectList) {
-//         taskList.push(getTaskListFromAProject(project.projectName));
-//     }
-    
-//     const taskCollection = await Promise.all(taskList);
-    
-//     for (var i = 0; i < projectList.length; ++i) {
-//         projectRows = createObjectForProjectListView(projectList[i].projectName, taskCollection[i]);
-//         projectTable.push(projectRows);
-//     }
-//     response.render('projectList',{dbUser,projectTable});
-// });
 
 /** The Create Project View **/
-app.get('/createProject', isLoggedIn, async(request,response) => {
-    const user = request.user;
-    const dbUser = await getUserInfo(user);
+app.get('/createProject', async(request,response) => {
+    // const user = "warnemun@oregonstate.edu"; //
+    dbUser = request.user;
+    // const dbUser = await getUserInfo(user);
     const dbUsers = await getCollection("Users");
     /* Add Functionality for getting all project managers and all users*/
     const dbPMs = await getProjectManagers('Users');
@@ -513,13 +440,15 @@ app.post('/createProject', (request, response) => {
 // });
 
 /** Task View **/
-app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
-    const user = request.user; 
+app.get('/task/:projectName/:taskName', async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    dbUser = request.user; 
+    console.log("task: ",dbUser);
     const projectName = request.params.projectName;
     var taskName = request.params.taskName;
 
     const dbProjects = await getProjectInfo(projectName);
-    const dbUser = await getUserInfo(user);
+    // const dbUser = await getUserInfo(user);
     const dbTasks = await getTaskInfo(projectName,taskName);
 
     // Convert Task Due Date to MM/DD/YYYY format
@@ -546,12 +475,14 @@ app.get('/task/:projectName/:taskName', isLoggedIn, async(request,response) =>{
 //     response.render('createComment',{dbProjects,dbUser,dbTasks});
 // });
 /** Create Task Functionality **/
-app.get('/createTask/:projectName', isLoggedIn, async(request,response) =>{
-    const user = request.user; 
+app.get('/createTask/:projectName', async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    dbUser = request.user; 
+    console.log("createtask: ",dbUser);
     const projectName = request.params.projectName;
 
     const dbProjects = await getProjectInfo(projectName);
-    const dbUser = await getUserInfo(user);
+    // const dbUser = await getUserInfo(user);
     const dbUsers = await getCollection("Users");
 
     response.render('createTask',{dbProjects,dbUser,dbUsers});
@@ -571,12 +502,14 @@ app.post('/createTask', (request, response) =>{
 });
 
 /** The Single Project Summary view */
-app.get('/projectSummary/:projectName', isLoggedIn, async(request,response) =>{
-    const user = request.user; 
+app.get('/projectSummary/:projectName', async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    dbUser = request.user; 
+    console.log("projectsummary: ",dbUser);
     const projectName = request.params.projectName;
 
     const dbProjects = await getProjectInfo(projectName);
-    const dbUser = await getUserInfo(user);
+    // const dbUser = await getUserInfo(user);
     const dbTasks = await getTaskListFromAProject(projectName);
 
     // Convert Task Due Dates to MM/DD/YYYY format
@@ -589,12 +522,14 @@ app.get('/projectSummary/:projectName', isLoggedIn, async(request,response) =>{
 });
 
 /** The Single Project Tracking view */
-app.get('/projectTracking/:projectName', isLoggedIn, async(request,response) =>{
-    const user = request.user; 
+app.get('/projectTracking/:projectName', async(request,response) =>{
+    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    dbUser = request.user; 
+    console.log("projectTracking: ",dbUser);
     const projectName = request.params.projectName;
     
     const dbProjects = await getProjectInfo(projectName);
-    const dbUser = await getUserInfo(user); 
+    // const dbUser = await getUserInfo(user); 
     const dbTasks = await getTaskListFromAProject(projectName);
     const dateRange = getDateRange(dbProjects.projectStartDate.toDate(), dbProjects.projectDueDate.toDate());
     var chartData = [];
