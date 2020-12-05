@@ -20,7 +20,7 @@
 				margin-bottom: -50px;
 			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
-			a {color: black !important;}
+			#logo a {color: #417DB5 !important; }
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
@@ -37,7 +37,7 @@
   			</div>
     		<div class="row justify-content-lg-center">
 				<div class="col col-lg-auto pt-0">
-			  		<h1>{{dbProjects.projectName}}</h1>
+			  		<h1>Project: {{dbProjects.projectName}}</h1>
 		  		</div>
 		  	</div>
     	</div>
@@ -77,22 +77,22 @@
   				<div class="row">
   					<div class="col-3 empty-container">
   					</div>
-					<div class="col">
+  					<div class="col border border-dark" style="background: #F1F3F4">
 						<form action="/createTask" method="POST">
 							<input type="hidden" id="hiddenProjectName" name="projectName" value='{{dbProjects.projectName}}' required>
-							<div class="row form-group">
+							<div class="row form-group pl-2 pr-2 pt-4">
 								<label id="taskNameInputLabel" for="taskNameInput">Task Name</label>
 								<div class="col pr-0">
 									<input type="text" class="form-control border border-dark" id="taskName"  placeholder="Enter New Unique Task Name" name="taskName" required>
 								</div>
 							</div>
 				
-							<div class="row form-group">
+							<div class="row form-group pl-2 pr-2">
 								<label class="pr-4 mr-1" for="taskDueDate" required>Due date</label>
 								<input type="date" class="datepicker pl-2" data-date-format="mm/dd/yyy" id="taskDueDate" name="taskDueDate">
 							</div>
 				
-							<div class="row form-group">
+							<div class="row form-group pl-2 pr-2">
 								<label id="taskAssigneeLabel" class="pr-2" for="taskAssignee">Assign To</label>
 								<div class="col-6">
 									<select id="taskAssignee" class="form-control border border-dark" name="taskAssignee" required>
@@ -102,7 +102,7 @@
 									</select>
 								</div>
 							</div>
-							<div class="row form-group">
+							<div class="row form-group pl-2 pr-2">
 								<label id="taskDescriptionInputLabel"for="taskDescriptionInput">Task Description</label>
 								<textarea class="form-control border border-dark" id="taskDescriptionInput"  placeholder="Brief Task Description" name="taskDescription" required></textarea>
 							</div>
@@ -112,8 +112,8 @@
 								<div class="col-8 empty-container">
 								</div>
 
-								<div class="col pr-0">		
-									<button type="submit" class="btn btn-primary float-right">Create Task</button>
+								<div class="col pr-2">		
+									<button type="submit" class="btn btn-primary float-right" style="background:#417DB5; color:black !important">Create Task</button>
 								</div>
 
 							</div>

@@ -14,9 +14,9 @@ const serviceAccount = require(getMySecretKey());
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://perro-pm-project.firebaseio.com"
+  databaseURL: "" //You need to add your db url
 });
-//Replace this code block with replacement code above*/
+
 const firestoreCon = admin.firestore();
 
 const bodyParser = require('body-parser');
@@ -84,10 +84,12 @@ app.get('/error', (request, response) =>
 );
 
 passport.serializeUser(function(user, cb){
+    console.log("Serialize:",user);
     cb(null, user);
 });
 
 passport.deserializeUser(function(obj, cb){
+    console.log("DeSerialize:",obj);
     cb(null, obj);   
 });
 
@@ -374,7 +376,10 @@ app.get('/', (request, response) => {
 
 /** The Project List view **/
 app.get('/projectList',async(request,response) => {
-    dbUser = request.useremail;
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
 
     console.log("projectList: ",request.useremail);
     // const dbUser = await getUserInfo(user);
@@ -400,8 +405,12 @@ app.get('/projectList',async(request,response) => {
 
 /** The Create Project View **/
 app.get('/createProject', async(request,response) => {
-    // const user = "warnemun@oregonstate.edu"; //
-    dbUser = request.user;
+    
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
+
     // const dbUser = await getUserInfo(user);
     const dbUsers = await getCollection("Users");
     /* Add Functionality for getting all project managers and all users*/
@@ -441,8 +450,11 @@ app.post('/createProject', (request, response) => {
 
 /** Task View **/
 app.get('/task/:projectName/:taskName', async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
-    dbUser = request.user; 
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
+
     console.log("task: ",dbUser);
     const projectName = request.params.projectName;
     var taskName = request.params.taskName;
@@ -474,11 +486,13 @@ app.get('/task/:projectName/:taskName', async(request,response) =>{
 //     //const dbComments = await getTaskComments(projectName, taskName);
 //     response.render('createComment',{dbProjects,dbUser,dbTasks});
 // });
-/** Create Task Functionality **/
+/** Create Task View **/
 app.get('/createTask/:projectName', async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
-    dbUser = request.user; 
-    console.log("createtask: ",dbUser);
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
+
     const projectName = request.params.projectName;
 
     const dbProjects = await getProjectInfo(projectName);
@@ -487,7 +501,13 @@ app.get('/createTask/:projectName', async(request,response) =>{
 
     response.render('createTask',{dbProjects,dbUser,dbUsers});
 });
+/* Create Task Post */
 app.post('/createTask', (request, response) =>{
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
+
     const data = request.body;
     const taskName = data.taskName;
     const projectName = data.projectName;
@@ -501,11 +521,13 @@ app.post('/createTask', (request, response) =>{
     response.redirect("/task/" + projectName + "/" + taskName);
 });
 
-/** The Single Project Summary view */
+/** The Single Project Summary */
 app.get('/projectSummary/:projectName', async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
-    dbUser = request.user; 
-    console.log("projectsummary: ",dbUser);
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
+
     const projectName = request.params.projectName;
 
     const dbProjects = await getProjectInfo(projectName);
@@ -523,9 +545,11 @@ app.get('/projectSummary/:projectName', async(request,response) =>{
 
 /** The Single Project Tracking view */
 app.get('/projectTracking/:projectName', async(request,response) =>{
-    // const user = "warnemun@oregonstate.edu"; // Assign the user identefier here -> whatever is the document name for the logged in user
-    dbUser = request.user; 
-    console.log("projectTracking: ",dbUser);
+    const user = "warnemun"; // Assign the user identefier here -> whatever is the document name for the logged in user
+    const userrole = 'project manager'; 
+
+    var dbUser = request.user || { 'username': user, 'userrole': userrole};
+
     const projectName = request.params.projectName;
     
     const dbProjects = await getProjectInfo(projectName);

@@ -61,6 +61,8 @@
 			.highcharts-data-table tr:hover {
 			    background: #f1f7ff;
 			}
+			#logo a {color: #417DB5 !important; }
+			.task-links {color: #417DB5 !important;}
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
@@ -77,7 +79,7 @@
   			</div>
     		<div class="row justify-content-lg-center">
 				<div class="col col-lg-auto pt-0">
-			  		<h1>{{dbProjects.projectName}}</h1>
+			  		<h1>Project: {{dbProjects.projectName}}</h1>
 		  		</div>
 		  	</div>
     	</div>
@@ -145,15 +147,12 @@
 		    	},
 		    	series: [{
 		        	name: 'Progress',
-		        	// data: [0, 1, 1, 7, 7, 10, 13, 17,'','','']
 		        	data: [{{chartData.complete}}]
 		    	}, {
 		        	name: 'Remaining',
-		        	// data: [10, 13, 13, 10, 11, 11, 10, 6,'','','']
 		        	data: [{{chartData.open}}]
 			    }, {
 			        name: 'Total',
-			        // data: [10, 14, 14, 17, 18, 21, 23, 23,23,23,23]
 			        data: [{{chartData.total}}]
 			    }],
 		    	responsive: {
@@ -182,7 +181,7 @@
 		      			<li class="">{{dbProjects.projectName}}</li>
 		      			<ul class="">
 		      			{{#each dbTasks}}
-		      				<li class=""><a href="/task/{{projectName}}/{{taskName}}">{{taskName}}</a></li>
+		      				<li class=""><a class="task-links" href="/task/{{projectName}}/{{taskName}}">{{taskName}}</a></li>
 	      				{{/each}}
 		      			</ul>
 		      		</ul>

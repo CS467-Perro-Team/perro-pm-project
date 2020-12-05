@@ -7,33 +7,6 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!-- Latest compiled Bootstrap JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-		<script>
-		HTMLDocument.prototype.ready = function () {
-			return new Promise(function(resolve, reject) {
-				if (document.readyState === 'complete') {
-					resolve(document);
-				} else {
-					document.addEventListener('DOMContentLoaded', function() {
-							resolve(document);
-						});
-				}
-			});
-		}
-		document.ready().then(function(){
-			var a =	document.getElementById("welcomeHeader");
-			var b =	document.getElementById("welcomeMessage");
-			var c = document.getElementById("returnUser");
-			if(document.location.pathname.includes('projectList/welcome')){
-				a.classList.add("d");
-				b.classList.add("d");
-				c.classList.add("d-none");
-			} else {
-				a.classList.add("d-none");
-				b.classList.add("d-none");
-				c.classList.add("d");
-			}
-		});
-		</script>
 		<style>
 			html, body{
 				height: 100%;
@@ -46,8 +19,17 @@
 				min-height: 100%;
 				margin-bottom: -50px;
 			}
+			.login-container{
+				min-height: 66%;
+				margin-bottom: 0px;
+			}
+			.internal-top-row, .internal-email-row {
+				min-height: 25%
+			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
-			a {color: black !important;}
+			#createProjectButton a {color: black !important;}
+			#logo a {color: #417DB5 !important; }
+			.task-links {color: #417DB5 !important;}
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
@@ -63,22 +45,11 @@
   				</div>
   			</div>
     		<div class="row justify-content-lg-center">
-				<div class="col col-lg-auto pt-0" id="welcomeHeader">
-			  		<h1>Welcome {{dbUser.username}}!</h1>
-			  	</div>
 			  	<div class="col col-lg-auto pt-0" id="returnUser">
 			  		<h1>Project List</h1>
 		  		</div>
 		  	</div>
-		  	<div class="row justify-content-lg-center" id="welcomeMessage">
-		  		<div class="col">
-		  		</div>
-		  		<div class="col-6 justify-content-center"><p class="mb-0 justify-content-center">Once you are assigned to a project, you will see the project listed below.</p><p class="mt-0 ml-5">Please contact your PM to be added to your first project.</p>
-		  		</div>
-		  		<div class="col">
-		  		</div>
-		  	</div>
-    	</div>
+		</div>
     	<!-- End Header Container-->
 
     	<!-- Begin User Info Container -->
@@ -135,7 +106,7 @@
 	      			<tbody>
 						{{#each projectTable}}
 		      			<tr class="table" scope="row">
-		      				<td class="border-right-dark"><a href="/projectSummary/{{name}}">{{name}}</a></td>
+		      				<td class="border-right-dark"><a class="task-links" href="/projectSummary/{{name}}">{{name}}</a></td>
 		      				<td>{{completedTasks}}</td>
 		      				<td>{{remainingTasks}}</td>
 		      				<td>{{totalTasks}}</td>

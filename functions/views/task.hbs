@@ -23,7 +23,9 @@
 				min-height: 100px;
 			}
 			td { border-right: 1px solid black !important; height: 35px !important;}
-			a {color: black !important;}
+			#logo a {color: #417DB5 !important; }
+			td a.comment-list {color: #417DB5 !important; }
+			a.addComment {color: #417DB5 !important; }
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
@@ -111,7 +113,7 @@
 						<span id="taskDescriptionLabel" class="font-weight-bold">Task Description</span>
 					</div>
 					<div class="col mr-0 pr-0">
-	      				<button id="addCommentButton" class="mr-0 float-right" data-toggle="buttons"><a href="#">Add Comment</a></button>
+	      				<button id="addCommentButton" class="mr-0 float-right" data-toggle="buttons"><a class="addComment" href="#">Add Comment</a></button>
 	  				</div>
 	  			</div>
 		    	<!--End Labels for Task Details Row-->
@@ -143,7 +145,7 @@
 			      			<tbody>
 			      				{{#each dbTasks.comments}}
 				      			<tr class="table" scope="row">
-				      				<td class="border-right-dark"><a href="#">{{commentText}}</a></td>
+				      				<td class="border-right-dark"><a class="comment-list" href="#">{{commentText}}</a></td>
 				      				<td>{{commentUsername}}</td>
 				      				<td>{{commentDate}}</td>
 				      			</tr>

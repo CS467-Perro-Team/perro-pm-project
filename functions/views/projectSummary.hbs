@@ -24,6 +24,8 @@
 			.table tbody tr td {
 				width: 25;
 			}
+			#logo a {color: #417DB5 !important; }
+			.task-links {color: #417DB5 !important;}
 		</style>
 		<meta name="robots" content="noindex nofollow">
   	</head>
@@ -40,7 +42,7 @@
   			</div>
     		<div class="row justify-content-lg-center">
 				<div class="col col-lg-auto pt-0">
-			  		<h1>{{dbProjects.projectName}}</h1>
+			  		<h1>Project: {{dbProjects.projectName}}</h1>
 		  		</div>
 		  	</div>
     	</div>
@@ -98,7 +100,7 @@
       			<tbody>
 					  {{#each dbTasks}} 
 						<tr scope="row">
-							<td class="taskNameField"><a href="/task/{{projectName}}/{{taskName}}">{{taskName}}</a></td>
+							<td class="taskNameField"><a class="task-links" href="/task/{{projectName}}/{{taskName}}">{{taskName}}</a></td>
 							<td class="taskDescriptionField">{{taskDescription}}</td>
 							<td class="taskDueDateField">{{taskDueDate}}</td>
 							<td class="taskAssignee">{{taskAssignee}}</td>
